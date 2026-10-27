@@ -1,0 +1,50 @@
+<html th:replace="~{fragments/layout :: pagina('Proveedores', ~{::contenido})}" xmlns:th="http://www.thymeleaf.org">
+<body>
+<section th:fragment="contenido">
+    <div class="cabecera-vista">
+        <h2>Proveedores</h2>
+        <a class="btn btn-primario" th:if="${sesion.puede('proveedores','crear')}" th:href="@{/proveedores/nuevo}">Nuevo proveedor</a>
+    </div>
+    <form class="tarjeta filtros" method="get" th:action="@{/proveedores}">
+        <label class="filtro-buscar">Buscar <input type="text" name="texto" th:value="${texto}" placeholder="RUC, razón social, contacto"></label>
+        <label>Estado
+            <select name="estado"><option value="">Todos</option>
+                <option value="activo" th:selected="${estado == 'activo'}">Activos</option>
+                <option value="inactivo" th:selected="${estado == 'inactivo'}">Inactivos</option></select>
+        </label>
+        <button class="btn" type="submit">Filtrar</button>
+    </form>
+    <div class="tarjeta tabla-scroll">
+        <p class="conteo" th:text="${proveedores.size()} + ' proveedor(es)'"></p>
+        <table>
+            <thead><tr><th>RUC / DNI</th><th>Razón social</th><th>Contacto</th><th>Teléfono</th><th>Correo</th><th>Guías</th><th>Estado</th><th>Acciones</th></tr></thead>
+            <tbody>
+            <tr th:each="p : ${proveedores}" th:classappend="${!p.activo} ? 'fila-inactiva'">
+                <td class="texto-suave" th:text="${p.tipoDoc} + ' ' + ${p.documento}"></td>
+                <td><strong th:text="${p.razonSocial}"></strong><br><span class="texto-suave" th:text="${p.nombreComercial}"></span></td>
+                <td th:text="${p.contacto != null ? p.contacto : '-'}"></td>
+                <td class="sin-salto" th:text="${p.telefono != null ? p.telefono : '-'}"></td>
+                <td class="texto-suave" th:text="${p.correo != null ? p.correo : '-'}"></td>
+                <td th:text="${p.guias}"></td>
+                <td><span class="badge" th:classappend="${p.activo} ? 'verde' : 'roja'" th:text="${p.activo} ? 'ACTIVO' : 'INACTIVO'"></span></td>
+                <td class="celda-acciones">
+                    <a class="btn btn-mini" th:href="@{/proveedores/{id}(id=${p.idProveedor})}">Ver</a>
+                    <th:block th:if="${sesion.puede('proveedores','editar')}">
+                        <a class="btn btn-mini" th:href="@{/proveedores/{id}/editar(id=${p.idProveedor})}">Editar</a>
+                        <form th:action="@{/proveedores/{id}/estado(id=${p.idProveedor})}" method="post">
+                            <button class="btn btn-mini" type="submit" th:text="${p.activo} ? 'Desactivar' : 'Activar'"></button>
+                        </form>
+                    </th:block>
+                    <form th:if="${sesion.puede('proveedores','eliminar')}" th:action="@{/proveedores/{id}/eliminar(id=${p.idProveedor})}" method="post"
+                          data-confirmar="¿Eliminar el proveedor? Si tiene guías registradas se desactivará en su lugar.">
+                        <button class="btn btn-mini btn-peligro-suave" type="submit">Eliminar</button>
+                    </form>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+        <p class="texto-suave centrado" th:if="${proveedores.isEmpty()}">No hay proveedores con esos filtros.</p>
+    </div>
+</section>
+</body>
+</html>

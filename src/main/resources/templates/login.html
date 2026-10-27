@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ingresar - Mi Bodega</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body data-contexto="plataforma">
+<div class="pantalla-login">
+    <form class="tarjeta-login" th:action="@{/login}" method="post">
+        <h1>Mi Bodega</h1>
+        <p class="subtitulo centrado">Gestión de ventas e inventario<br>para bodegas y minimarkets</p>
+        <div class="mensaje mensaje-error" th:if="${error}" th:text="${error}"></div>
+        <label>Usuario <input type="text" name="usuario" th:value="${usuario}" autocomplete="username" required autofocus></label>
+        <label>Contraseña <input type="password" name="clave" autocomplete="current-password" required></label>
+        <button type="submit" class="btn btn-primario btn-bloque">Ingresar</button>
+        <details class="ayuda-login">
+            <summary>Usuarios de prueba</summary>
+            <!--<p><strong>Plataforma:</strong> superadmin / super123 - soporte / soporte123 - auditor / auditor123</p>-->
+            <p><strong>Los Andes Market:</strong> admin / admin123 - cajero / cajero123 - almacen / almacen123 - jefe / jefe1234</p>
+            <!--<p><strong>Bodegas Express:</strong> carlos / carlos123 - maria / maria123</p>-->
+        </details>
+    </form>
+</div>
+</body>
+</html>

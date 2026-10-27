@@ -1,0 +1,36 @@
+<html th:replace="~{fragments/layout :: pagina('Empresa', ~{::contenido})}" xmlns:th="http://www.thymeleaf.org">
+<body>
+<section th:fragment="contenido">
+    <div class="cabecera-vista"><h2 th:text="${empresa.idEmpresa == null} ? 'Nueva empresa' : 'Editar empresa'"></h2></div>
+    <form class="tarjeta" style="max-width:700px" th:action="@{/plataforma/empresas/guardar}" method="post" enctype="multipart/form-data" th:object="${empresa}">
+        <input type="hidden" th:field="*{idEmpresa}">
+        <div class="bloque-logo">
+            <img th:if="${empresa.tieneLogo}" class="avatar avatar-logo" th:src="@{/archivos/empresa/{id}/logo(id=${empresa.idEmpresa})}" style="width:64px;height:64px" alt="logo">
+            <div>
+                <strong>Logo de la empresa</strong><br>
+                <span class="texto-suave">PNG o JPG, máximo 1 MB. Se usa en la barra superior, la boleta y el cargo de recepción.</span><br>
+                <input type="file" name="archivoLogo" accept="image/png,image/jpeg">
+            </div>
+        </div>
+        <div class="grilla-form">
+            <label>Nombre comercial <input type="text" th:field="*{nombreComercial}" placeholder="Ej: El Sol Market"></label>
+            <label>RUC <input type="text" th:field="*{ruc}" maxlength="11" required></label>
+            <label class="col-2">Razón social <input type="text" th:field="*{razonSocial}" required></label>
+            <label class="col-2">Dirección principal <input type="text" th:field="*{direccion}"></label>
+            <label>Rubro <input type="text" th:field="*{rubro}" placeholder="Minimarket, bodega..."></label>
+            <label>Plan <select th:field="*{plan}"><option th:each="p : ${planes}" th:value="${p}" th:text="${p}"></option></select></label>
+            <label>Teléfono <input type="text" th:field="*{telefono}"></label>
+            <label>Correo <input type="email" th:field="*{correo}"></label>
+        </div>
+        <p class="texto-suave" th:if="${empresa.idEmpresa == null}">La empresa se crea en estado EN PRUEBA y con el rol Administrador.</p>
+        <div class="acciones-modal">
+            <a class="btn" th:href="@{/plataforma/empresas}">Cancelar</a>
+            <button class="btn btn-primario" type="submit">Guardar</button>
+        </div>
+    </form>
+    <form th:if="${empresa.tieneLogo}" th:action="@{/plataforma/empresas/{id}/quitar-logo(id=${empresa.idEmpresa})}" method="post" data-confirmar="¿Quitar el logo?">
+        <button class="btn btn-mini btn-peligro-suave" type="submit">Quitar logo</button>
+    </form>
+</section>
+</body>
+</html>

@@ -1,0 +1,39 @@
+<html th:replace="~{fragments/layout :: pagina('Ficha del cliente', ~{::contenido})}" xmlns:th="http://www.thymeleaf.org">
+<body>
+<section th:fragment="contenido">
+    <div class="cabecera-vista">
+        <h2 th:text="${cliente.nombre}"></h2>
+        <a class="btn" th:href="@{/clientes}">&larr; Clientes</a>
+    </div>
+    <p class="subtitulo" th:text="${cliente.tipoDoc} + ' ' + ${cliente.documento} + ' - ' + (${cliente.telefono} ?: 'sin teléfono') + ' - ' + (${cliente.correo} ?: 'sin correo') + ' - cliente desde ' + ${@fmt.fecha(cliente.fechaRegistro)}"></p>
+    <div class="grilla-kpi">
+        <div class="tarjeta kpi"><span class="kpi-titulo">TOTAL COMPRADO</span><span class="kpi-valor" th:text="${@fmt.soles(cliente.totalComprado)}"></span></div>
+        <div class="tarjeta kpi"><span class="kpi-titulo">COMPRAS</span><span class="kpi-valor" th:text="${cliente.compras}"></span></div>
+        <div class="tarjeta kpi"><span class="kpi-titulo">ÚLTIMA COMPRA</span><span class="kpi-valor kpi-valor-chico" th:text="${@fmt.fechaHora(cliente.ultimaCompra)}"></span></div>
+        <div class="tarjeta kpi"><span class="kpi-titulo">TICKET PROMEDIO</span><span class="kpi-valor" th:text="${@fmt.soles(cliente.ticketPromedio)}"></span></div>
+    </div>
+    <div class="tarjeta">
+        <h3>Productos frecuentes</h3>
+        <span class="badge gris" th:each="f : ${frecuentes}" th:text="${f.nombre} + ' - ' + ${f.unidades} + ' unid.'" style="margin-right:4px"></span>
+        <p class="texto-suave" th:if="${frecuentes.isEmpty()}">Aún no tiene compras.</p>
+    </div>
+    <div class="tarjeta tabla-scroll">
+        <h3 th:text="'Historial de comprobantes (' + ${historial.size()} + ')'"></h3>
+        <table>
+            <thead><tr><th>Comprobante</th><th>Fecha</th><th>Sede</th><th>Pago</th><th>Total</th><th>Estado</th><th></th></tr></thead>
+            <tbody>
+            <tr th:each="v : ${historial}" th:classappend="${v.anulada} ? 'fila-inactiva'">
+                <td th:text="${v.numeroComprobante}"></td>
+                <td class="sin-salto" th:text="${@fmt.fechaHora(v.fechaHora)}"></td>
+                <td th:text="${v.sedeNombre}"></td>
+                <td th:text="${v.metodoPago}"></td>
+                <td class="sin-salto" th:text="${@fmt.soles(v.total)}"></td>
+                <td><span class="badge" th:classappend="${v.anulada} ? 'roja' : 'verde'" th:text="${v.estado}"></span></td>
+                <td><a class="btn btn-mini" th:if="${sesion.puede('ventas','ver')}" th:href="@{/ventas/{id}/comprobante(id=${v.idVenta},volverCliente=${cliente.idCliente})}">Ver boleta</a></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</section>
+</body>
+</html>

@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org" th:fragment="pagina(titulo, contenido)" th:attr="data-tema=${sesion.tema}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${titulo} + ' - Mi Bodega'">Mi Bodega</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+    <link rel="stylesheet" th:href="@{/css/dashboard.css}">
+    <link rel="stylesheet" th:href="@{/css/modulos.css}">
+    <link rel="stylesheet" th:href="@{/css/comprobantes.css}">
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body th:attr="data-contexto=${sesion.enEmpresa} ? 'empresa' : 'plataforma'">
+<div class="app">
+
+    <!-- Menu lateral: solo las opciones que permite el rol activo -->
+    <aside class="lateral">
+        <div class="lateral-marca"><strong>Mi Bodega</strong></div>
+        <div class="lateral-contexto">
+            <span class="etiqueta-nivel" th:if="${sesion.enEmpresa}" th:text="'EMPRESA: ' + ${sesion.empresaNombre}"></span>
+            <span class="etiqueta-nivel" th:unless="${sesion.enEmpresa}" th:text="'PLATAFORMA - ' + ${sesion.rolNombre}"></span>
+        </div>
+        <nav class="menu">
+            <a th:if="${sesion.interno and sesion.enEmpresa}" class="item-menu volver" th:href="@{/plataforma/empresas}">&larr; Volver a empresas</a>
+            <a th:each="item : ${menu}" class="item-menu" th:href="@{${item.url}}" th:text="${item.texto}"
+               th:classappend="${#strings.startsWith(rutaActual, item.url)} ? 'activo'"></a>
+        </nav>
+        <a class="item-menu" th:href="@{/perfil}">Mi perfil</a>
+        <form th:action="@{/logout}" method="post">
+            <button type="submit" class="item-menu salir">Cerrar sesión</button>
+        </form>
+    </aside>
+
+    <div class="zona-principal">
+        <header class="topbar">
+            <div class="topbar-izquierda">
+                <th:block th:if="${sesion.enEmpresa}">
+                    <img th:if="${sesion.empresaTieneLogo}" class="avatar avatar-logo" th:src="@{/archivos/empresa/{id}/logo(id=${sesion.idEmpresa})}" alt="logo" style="width:40px;height:40px">
+                    <div th:unless="${sesion.empresaTieneLogo}" class="avatar" style="width:40px;height:40px">MB</div>
+                    <div>
+                        <div class="topbar-titulo"><span th:text="${sesion.empresaNombre}"></span> <span class="texto-suave" th:text="'RUC ' + ${sesion.empresaRuc}"></span></div>
+                        <div class="migas" th:text="${titulo}"></div>
+                    </div>
+                </th:block>
+                <th:block th:unless="${sesion.enEmpresa}">
+                    <div class="avatar plataforma-avatar" style="width:40px;height:40px">MB</div>
+                    <div>
+                        <div class="topbar-titulo">Plataforma Mi Bodega <span class="badge gris">MODO PLATAFORMA</span></div>
+                        <div class="migas" th:text="${titulo}"></div>
+                    </div>
+                </th:block>
+            </div>
+            <div class="topbar-derecha">
+                <!-- Sede: el administrador la elige, los demas usan su sede -->
+                <form th:if="${sesion.enEmpresa and (sesion.adminEmpresa or sesion.interno)}" th:action="@{/sede-vista}" method="post" class="en-linea">
+                    <input type="hidden" name="volver" th:value="${rutaActual}">
+                    <select name="idSede" class="selector-sede" onchange="this.form.submit()" title="Sede en la que trabajas">
+                        <option th:each="sd : ${sedesActivas}" th:value="${sd.idSede}" th:text="${sd.nombre}"
+                                th:selected="${sd.idSede == sesion.sedeActual}"></option>
+                    </select>
+                </form>
+                <th:block th:if="${sesion.enEmpresa and !(sesion.adminEmpresa or sesion.interno)}">
+                    <span class="chip-sede" th:each="sd : ${sedesActivas}" th:if="${sd.idSede == sesion.sedeActual}" th:text="${sd.nombre}"></span>
+                </th:block>
+                <form th:action="@{/perfil/tema}" method="post" class="en-linea">
+                    <input type="hidden" name="volver" th:value="${rutaActual}">
+                    <input type="hidden" name="valor" th:value="${sesion.tema == 'oscuro'} ? 'claro' : 'oscuro'">
+                    <button type="submit" class="boton-tema" th:text="${sesion.tema == 'oscuro'} ? 'Modo claro' : 'Modo oscuro'"></button>
+                </form>
+                <a class="topbar-usuario" th:href="@{/perfil}" style="text-decoration:none;color:inherit">
+                    <span class="avatar-iniciales" style="width:30px;height:30px;font-size:11px" th:text="${sesion.iniciales}"></span>
+                    <span><strong th:text="${sesion.nombre}"></strong><br><span class="badge gris" th:text="${sesion.rolNombre}"></span></span>
+                </a>
+            </div>
+        </header>
+
+        <div class="banner-contexto" th:if="${sesion.interno and sesion.enEmpresa}">
+            <span><span class="badge-contexto">MODO EMPRESA</span> Administrando: <strong th:text="${sesion.empresaNombre}"></strong>
+                <span class="texto-banner-suave" th:text="${sesion.rolPrincipal} ? '' : ' - acceso de solo lectura'"></span></span>
+            <a class="btn btn-mini btn-banner" th:href="@{/plataforma/empresas}">&larr; Volver a empresas</a>
+        </div>
+
+        <main class="contenido">
+            <div class="mensaje mensaje-ok" th:if="${ok}" th:text="${ok}"></div>
+            <div class="mensaje mensaje-error" th:if="${error}" th:text="${error}"></div>
+            <th:block th:replace="${contenido}"></th:block>
+        </main>
+    </div>
+</div>
+<script th:src="@{/js/app.js}"></script>
+</body>
+</html>

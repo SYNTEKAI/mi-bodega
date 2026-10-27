@@ -1,0 +1,13 @@
+<html th:replace="~{fragments/layout :: pagina('Contraseña temporal', ~{::contenido})}" xmlns:th="http://www.thymeleaf.org">
+<body>
+<section th:fragment="contenido">
+    <div class="tarjeta" style="max-width:520px">
+        <h2>Contraseña temporal generada</h2>
+        <p>Entrégala a <strong th:text="${nombre}"></strong> por un canal seguro. <strong>Solo se muestra esta vez.</strong></p>
+        <p class="centrado" style="margin:18px 0"><code class="clave-temporal" th:text="${temporal}"></code></p>
+        <p class="texto-suave" th:text="${forzado} ? 'Al ingresar, el sistema le pedirá crear una contraseña nueva.' : 'Podrá usarla hasta que la cambie desde su perfil.'"></p>
+        <div class="acciones-modal"><a class="btn btn-primario" th:href="@{${volver}}">Entendido</a></div>
+    </div>
+</section>
+</body>
+</html>

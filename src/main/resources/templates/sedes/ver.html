@@ -1,0 +1,20 @@
+<html th:replace="~{fragments/layout :: pagina('Sede', ~{::contenido})}" xmlns:th="http://www.thymeleaf.org">
+<body>
+<section th:fragment="contenido">
+    <div class="cabecera-vista"><h2 th:text="${sede.nombre}"></h2><a class="btn" th:href="@{/sedes}">&larr; Sedes</a></div>
+    <div class="tarjeta" style="max-width:600px">
+        <table class="tabla-detalle">
+            <tr><td>Código</td><td th:text="${sede.codigo}"></td></tr>
+            <tr><td>Dirección</td><td th:text="${sede.direccion}"></td></tr>
+            <tr><td>Distrito / Provincia</td><td th:text="${sede.distrito} + ', ' + ${sede.provincia}"></td></tr>
+            <tr><td>Responsable</td><td th:text="${sede.responsable} ?: '-'"></td></tr>
+            <tr><td>Teléfono</td><td th:text="${sede.telefono} ?: '-'"></td></tr>
+            <tr><td>Fecha de creación</td><td th:text="${@fmt.fecha(sede.fechaCreacion)}"></td></tr>
+            <tr><td>Usuarios asignados</td><td th:text="${usuarios}"></td></tr>
+            <tr><td>Ventas registradas</td><td th:text="${ventas}"></td></tr>
+            <tr><td>Estado</td><td th:text="${sede.activo} ? 'ACTIVA' : 'INACTIVA'"></td></tr>
+        </table>
+    </div>
+</section>
+</body>
+</html>

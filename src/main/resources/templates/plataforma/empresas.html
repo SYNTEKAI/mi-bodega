@@ -1,0 +1,41 @@
+<html th:replace="~{fragments/layout :: pagina('Empresas', ~{::contenido})}" xmlns:th="http://www.thymeleaf.org">
+<body>
+<section th:fragment="contenido">
+    <div class="cabecera-vista">
+        <h2>Empresas</h2>
+        <a class="btn btn-primario" th:if="${sesion.puede('empresas','crear')}" th:href="@{/plataforma/empresas/nueva}">Nueva empresa</a>
+    </div>
+    <div class="grilla-tarjetas">
+        <div class="tarjeta tarjeta-empresa" th:each="e : ${empresas}" th:classappend="${!e.operable} ? 'tarjeta-inactiva'">
+            <div class="fila-espaciada">
+                <div class="fila-avatar">
+                    <img th:if="${e.tieneLogo}" class="avatar avatar-logo" th:src="@{/archivos/empresa/{id}/logo(id=${e.idEmpresa})}" style="width:44px;height:44px" alt="logo">
+                    <div th:unless="${e.tieneLogo}" class="avatar" style="width:44px;height:44px" th:text="${#strings.substring(e.nombreMostrar, 0, 2).toUpperCase()}"></div>
+                    <div><h3 th:text="${e.nombreMostrar}"></h3><span class="texto-suave" th:text="${e.razonSocial}"></span></div>
+                </div>
+                <span class="badge" th:classappend="${e.estado == 'ACTIVA'} ? 'verde' : (${e.estado == 'EN PRUEBA'} ? 'ambar' : 'roja')" th:text="${e.estado}"></span>
+            </div>
+            <p class="texto-suave" th:text="'RUC ' + ${e.ruc} + ' - ' + (${e.rubro} ?: '-') + ' - Plan ' + ${e.plan}"></p>
+            <div class="mini-stats">
+                <div><strong th:text="${e.sedes}"></strong><span>Sedes</span></div>
+                <div><strong th:text="${e.usuarios}"></strong><span>Usuarios</span></div>
+                <div><strong th:text="${@fmt.fecha(e.fechaRegistro)}"></strong><span>Registro</span></div>
+            </div>
+            <div class="acciones-tarjeta">
+                <a class="btn btn-mini" th:if="${sesion.puede('empresas','editar')}" th:href="@{/plataforma/empresas/{id}/editar(id=${e.idEmpresa})}">Editar</a>
+                <form th:if="${sesion.puede('empresas','cambiar_estado')}" th:action="@{/plataforma/empresas/{id}/estado(id=${e.idEmpresa})}" method="post" class="fila-formulario" style="flex:1">
+                    <select name="estado" style="margin:0">
+                        <option th:each="st : ${estados}" th:value="${st}" th:text="${st}" th:selected="${st == e.estado}"></option>
+                    </select>
+                    <button class="btn btn-mini" type="submit">Cambiar estado</button>
+                </form>
+                <form th:if="${e.operable and sesion.puede('empresas','entrar')}" th:action="@{/plataforma/empresas/{id}/entrar(id=${e.idEmpresa})}" method="post">
+                    <button class="btn btn-mini btn-primario" type="submit">Administrar &rarr;</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <p class="texto-suave">SUSPENDIDA e INACTIVA bloquean el ingreso de los usuarios de la empresa. Sus datos se conservan.</p>
+</section>
+</body>
+</html>

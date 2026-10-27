@@ -1,0 +1,66 @@
+<html th:replace="~{fragments/layout :: pagina('Cargo de recepción', ~{::contenido})}" xmlns:th="http://www.thymeleaf.org">
+<body>
+<section th:fragment="contenido">
+    <div class="cabecera-vista no-imprimir">
+        <h2 th:text="'Recepción ' + ${r.numero}"></h2>
+        <div>
+            <a class="btn" th:href="@{/guias}">&larr; Guías recibidas</a>
+            <button class="btn btn-primario" type="button" onclick="window.print()">Imprimir / Guardar PDF</button>
+        </div>
+    </div>
+    <div class="tarjeta pagina-impresion">
+        <div class="cargo-cabecera">
+            <img th:if="${empresa.tieneLogo}" class="avatar avatar-logo" th:src="@{/archivos/empresa/{id}/logo(id=${empresa.idEmpresa})}" style="width:52px;height:52px" alt="logo">
+            <div><strong th:text="${empresa.razonSocial}"></strong><br><span class="texto-suave" th:text="'RUC ' + ${empresa.ruc} + ' - ' + (${empresa.direccion} ?: '')"></span></div>
+            <div class="cargo-numero"><span th:text="${r.borrador} ? 'BORRADOR DE RECEPCIÓN' : 'CARGO DE RECEPCIÓN'"></span><br>
+                <strong th:text="${r.numero}"></strong><br><span th:text="${r.estado}"></span></div>
+        </div>
+        <div class="cargo-bloques">
+            <div><span class="texto-suave">Proveedor</span><br><strong th:text="${proveedor.razonSocial}"></strong><br>
+                <span th:text="${proveedor.tipoDoc} + ' ' + ${proveedor.documento}"></span><br>
+                <span class="texto-suave">Guía del proveedor:</span> <strong th:text="${r.guiaProveedor}"></strong></div>
+            <div><span class="texto-suave">Recepción</span><br><span th:text="${@fmt.fechaHora(r.fechaHora)}"></span><br>
+                Sede: <span th:text="${r.sedeNombre}"></span><br>Registró: <span th:text="${r.usuarioNombre}"></span></div>
+        </div>
+        <p class="aviso-correccion" th:if="${r.borrador}">Borrador: todavía NO afecta el stock.</p>
+        <table>
+            <thead><tr><th>#</th><th>Producto</th><th>Marca</th><th>Presentación</th><th>Empaque</th><th>Cajas</th><th>Unid./emp.</th><th>Total unid.</th><th>Vence</th></tr></thead>
+            <tbody>
+            <tr th:each="d, i : ${r.detalles}">
+                <td th:text="${i.count}"></td>
+                <td th:text="${d.productoNombre}"></td>
+                <td th:text="${d.marca} ?: '-'"></td>
+                <td th:text="${d.presentacion} ?: ${d.unidad}"></td>
+                <td th:text="${d.empaque}"></td>
+                <td th:text="${d.cantidadEmpaques}"></td>
+                <td th:text="${d.contenido}"></td>
+                <td><strong th:text="${d.totalUnidades}"></strong></td>
+                <td th:text="${d.fechaVencimiento != null} ? ${@fmt.fecha(d.fechaVencimiento)} : '-'"></td>
+            </tr>
+            </tbody>
+            <tfoot><tr><td colspan="7"><strong>TOTAL</strong></td><td><strong th:text="${r.unidades}"></strong></td><td></td></tr></tfoot>
+        </table>
+        <p th:if="${r.observaciones != null}"><strong>Observaciones:</strong> <span th:text="${r.observaciones}"></span></p>
+        <div style="display:flex;justify-content:space-around;margin-top:60px;text-align:center">
+            <div style="border-top:1px solid #999;width:220px;padding-top:4px">Entregado por (proveedor)</div>
+            <div style="border-top:1px solid #999;width:220px;padding-top:4px" th:text="'Recibido por: ' + ${r.usuarioNombre}"></div>
+        </div>
+    </div>
+
+    <div class="tarjeta pagina-impresion no-imprimir">
+        <h3>Historial</h3>
+        <ul class="linea-tiempo">
+            <li th:each="a : ${eventos}"><strong th:text="${@fmt.fechaHora(a.fechaHora)}"></strong> -
+                <span class="badge" th:classappend="'accion-' + ${a.color}" th:text="${a.accion}"></span>
+                <span th:text="${a.usuarioNombre} + ' (' + ${a.rolNombre} + ')'"></span></li>
+        </ul>
+        <div class="tarjeta bloque-modificacion" th:each="m, i : ${modificaciones}">
+            <strong th:text="'Corrección ' + ${i.count}"></strong> - <span th:text="${@fmt.fechaHora(m.fechaHora)} + ' - ' + ${m.usuarioNombre} + ' (' + ${m.rolNombre} + ')'"></span><br>
+            <strong>Motivo:</strong> <span th:text="${m.motivo}"></span>
+            <pre style="white-space:pre-wrap;margin-top:6px" th:text="${m.cambios}"></pre>
+        </div>
+        <p class="texto-suave" th:if="${modificaciones.isEmpty()}">Esta recepción no tiene correcciones.</p>
+    </div>
+</section>
+</body>
+</html>

@@ -1,0 +1,58 @@
+<html th:replace="~{fragments/layout :: pagina('Auditoría', ~{::contenido})}" xmlns:th="http://www.thymeleaf.org">
+<body>
+<section th:fragment="contenido">
+    <div class="cabecera-vista"><h2 th:text="${global} ? 'Auditoría global del sistema' : 'Auditoría de la empresa'"></h2></div>
+    <form class="tarjeta filtros" method="get" th:action="${global} ? @{/plataforma/auditoria} : @{/auditoria}">
+        <label th:if="${global}">Empresa
+            <select name="empresa"><option value="">Todas</option><option value="0" th:selected="${empresa == 0}">Plataforma (sin empresa)</option>
+                <option th:each="e : ${empresas}" th:value="${e.idEmpresa}" th:text="${e.nombreMostrar}" th:selected="${e.idEmpresa == empresa}"></option></select>
+        </label>
+        <label th:unless="${global}">Sede
+            <select name="sede"><option value="">Todas</option>
+                <option th:each="sd : ${sedesActivas}" th:value="${sd.idSede}" th:text="${sd.nombre}" th:selected="${sd.idSede == sede}"></option></select>
+        </label>
+        <label>Usuario
+            <select name="usuario"><option value="">Todos</option>
+                <option th:each="u : ${usuarios}" th:value="${u.clave}" th:text="${u.usuario_nombre}" th:selected="${u.clave == usuario}"></option></select>
+        </label>
+        <label>Módulo
+            <select name="modulo"><option value="">Todos</option>
+                <option th:each="m : ${modulos}" th:value="${m}" th:text="${m}" th:selected="${m == modulo}"></option></select>
+        </label>
+        <label>Acción
+            <select name="accion"><option value="">Todas</option>
+                <option th:each="a : ${acciones}" th:value="${a}" th:text="${a}" th:selected="${a == accion}"></option></select>
+        </label>
+        <label>Desde <input type="date" name="desde" th:value="${desde}"></label>
+        <label>Hasta <input type="date" name="hasta" th:value="${hasta}"></label>
+        <label class="filtro-buscar">Buscar <input type="text" name="texto" th:value="${texto}" placeholder="Texto en la descripción"></label>
+        <button class="btn" type="submit">Filtrar</button>
+    </form>
+    <div class="tarjeta tabla-scroll">
+        <p class="conteo" th:text="${total} + ' registro(s)'"></p>
+        <table>
+            <thead><tr><th>Fecha</th><th th:if="${global}">Empresa</th><th>Sede</th><th>Usuario</th><th>Rol</th><th>Módulo</th><th>Acción</th><th>Descripción</th></tr></thead>
+            <tbody>
+            <tr th:each="a : ${registros}">
+                <td class="sin-salto" th:text="${@fmt.fechaHora(a.fechaHora)}"></td>
+                <td th:if="${global}" th:text="${a.empresaNombre} ?: 'Plataforma'"></td>
+                <td th:text="${a.sedeNombre} ?: '-'"></td>
+                <td th:text="${a.usuarioNombre}"></td>
+                <td><span class="badge gris" th:text="${a.rolNombre}"></span></td>
+                <td th:text="${a.modulo}"></td>
+                <td><span class="badge" th:classappend="'accion-' + ${a.color}" th:text="${a.accion}"></span></td>
+                <td th:text="${a.descripcion}"></td>
+            </tr>
+            </tbody>
+        </table>
+        <div class="paginacion" th:if="${totalPaginas > 1}" th:with="base=${global} ? '/plataforma/auditoria' : '/auditoria'">
+            <a class="btn btn-mini" th:if="${pagina > 1}"
+               th:href="@{${base}(empresa=${empresa},sede=${sede},usuario=${usuario},modulo=${modulo},accion=${accion},desde=${desde},hasta=${hasta},texto=${texto},pagina=${pagina - 1})}">Anterior</a>
+            <span class="texto-suave" th:text="'Página ' + ${pagina} + ' de ' + ${totalPaginas}"></span>
+            <a class="btn btn-mini" th:if="${pagina < totalPaginas}"
+               th:href="@{${base}(empresa=${empresa},sede=${sede},usuario=${usuario},modulo=${modulo},accion=${accion},desde=${desde},hasta=${hasta},texto=${texto},pagina=${pagina + 1})}">Siguiente</a>
+        </div>
+    </div>
+</section>
+</body>
+</html>

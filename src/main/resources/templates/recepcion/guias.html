@@ -1,0 +1,63 @@
+<html th:replace="~{fragments/layout :: pagina('Guías recibidas', ~{::contenido})}" xmlns:th="http://www.thymeleaf.org">
+<body>
+<section th:fragment="contenido">
+    <div class="cabecera-vista">
+        <h2>Guías recibidas</h2>
+        <div>
+            <a class="btn" th:if="${sesion.puede('recepcion','exportar')}"
+               th:href="@{/guias/excel(desde=${desde},hasta=${hasta},proveedor=${proveedor},producto=${producto},numero=${numero},estado=${estado})}">Exportar a Excel</a>
+            <a class="btn btn-primario" th:if="${sesion.puede('recepcion','crear')}" th:href="@{/recepcion}">Nueva recepción</a>
+        </div>
+    </div>
+    <form class="tarjeta filtros" method="get" th:action="@{/guias}">
+        <label>Desde <input type="date" name="desde" th:value="${desde}"></label>
+        <label>Hasta <input type="date" name="hasta" th:value="${hasta}"></label>
+        <label>Proveedor
+            <select name="proveedor"><option value="">Todos</option>
+                <option th:each="p : ${proveedores}" th:value="${p.idProveedor}" th:text="${p.razonSocial}" th:selected="${p.idProveedor == proveedor}"></option></select>
+        </label>
+        <label>Producto
+            <select name="producto"><option value="">Todos</option>
+                <option th:each="p : ${productos}" th:value="${p.idProducto}" th:text="${p.nombre}" th:selected="${p.idProducto == producto}"></option></select>
+        </label>
+        <label>N° interno o guía <input type="text" name="numero" th:value="${numero}" placeholder="GR-... o T001-..."></label>
+        <label>Estado
+            <select name="estado"><option value="">Todos</option>
+                <option th:each="e : ${ {'BORRADOR','CONFIRMADA','MODIFICADA','ANULADA'} }" th:value="${e}" th:text="${e}" th:selected="${e == estado}"></option></select>
+        </label>
+        <button class="btn" type="submit">Filtrar</button>
+    </form>
+    <div class="tarjeta tabla-scroll">
+        <p class="conteo" th:text="${guias.size()} + ' recepción(es) - ' + ${totalUnidades} + ' unidades ingresadas por estas guías'"></p>
+        <table>
+            <thead><tr><th>N° interno</th><th>Guía proveedor</th><th>Fecha</th><th>Proveedor</th><th>Productos</th><th>Unid.</th><th>Estado</th>
+                <th>Registró</th><th>Última modificación</th><th>Acciones</th></tr></thead>
+            <tbody>
+            <tr th:each="r : ${guias}" th:classappend="${r.estado == 'ANULADA'} ? 'fila-inactiva'">
+                <td class="sin-salto"><strong th:text="${r.numero}"></strong></td>
+                <td class="sin-salto" th:text="${r.guiaProveedor}"></td>
+                <td class="sin-salto" th:text="${@fmt.fechaHora(r.fechaHora)}"></td>
+                <td th:text="${r.proveedorNombre}"></td>
+                <td th:text="${r.productos}"></td>
+                <td th:text="${r.unidades}"></td>
+                <td><span class="badge" th:classappend="${r.estado == 'CONFIRMADA'} ? 'verde' : (${r.estado == 'MODIFICADA'} ? 'azul' : (${r.estado == 'ANULADA'} ? 'roja' : 'gris'))"
+                          th:text="${r.estado}"></span> <span th:if="${r.observaciones != null}" th:title="${r.observaciones}">(obs.)</span></td>
+                <td th:text="${r.usuarioNombre}"></td>
+                <td class="texto-suave" th:text="${r.ultimaModificacion != null} ? ${@fmt.fechaHora(r.ultimaModificacion)} + ' - ' + ${r.modificoNombre} : '-'"></td>
+                <td class="celda-acciones">
+                    <a class="btn btn-mini" th:href="@{/guias/{id}(id=${r.idRecepcion})}">Ver cargo</a>
+                    <a class="btn btn-mini" th:if="${(r.borrador and sesion.puede('recepcion','crear')) or (r.afectaStock and sesion.puede('recepcion','editar_confirmada'))}"
+                       th:href="@{/recepcion(id=${r.idRecepcion})}" th:text="${r.borrador} ? 'Editar' : 'Corregir'"></a>
+                    <form th:if="${sesion.puede('recepcion','anular') and r.estado != 'ANULADA'}" th:action="@{/guias/{id}/anular(id=${r.idRecepcion})}" method="post"
+                          th:attr="data-confirmar='¿Anular ' + ${r.numero} + '? Si ya afectó el stock, se retiran sus unidades. El registro se conserva.'">
+                        <button class="btn btn-mini btn-peligro-suave" type="submit">Anular</button>
+                    </form>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+        <p class="texto-suave centrado" th:if="${guias.isEmpty()}">No hay recepciones con esos filtros.</p>
+    </div>
+</section>
+</body>
+</html>

@@ -1,0 +1,23 @@
+/* Estilos del dashboard: KPIs y graficos */
+
+/* ---- Fila de KPIs ---- */
+.grilla-kpi { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; margin-bottom: 14px; }
+.kpi { display: flex; flex-direction: column; gap: 3px; margin-bottom: 0; padding: 14px 16px; }
+.kpi-titulo { color: var(--texto-suave); font-size: 0.72em; letter-spacing: .5px; font-weight: 600; }
+.kpi-valor { font-size: 1.45em; font-weight: 700; }
+.kpi-sub { font-size: 0.8em; color: var(--texto-suave); }
+.kpi.alerta { border-left: 4px solid #fab219; }
+.delta-sube { color: var(--sube); font-weight: 600; }
+.delta-baja { color: var(--baja); font-weight: 600; }
+
+/* ---- Grilla de gráficos (Chart.js) ---- */
+.grilla-graficos { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 14px; margin-bottom: 14px; }
+.tarjeta-grafico { margin-bottom: 0; }
+.tarjeta-grafico h3 { font-size: 0.92em; color: var(--texto-suave); font-weight: 600; }
+.lienzo { position: relative; height: 230px; }
+.ancho-2 { grid-column: span 2; }
+@media (max-width: 760px) { .ancho-2 { grid-column: span 1; } }
+
+/* ---- Alertas del panel de plataforma ---- */
+.tarjeta-alertas { border-left: 4px solid #fab219; }
+.linea-alerta { padding: 4px 0; color: var(--texto); }

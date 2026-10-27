@@ -1,0 +1,97 @@
+<html th:replace="~{fragments/layout :: pagina('Ventas', ~{::contenido})}" xmlns:th="http://www.thymeleaf.org">
+<body>
+<section th:fragment="contenido">
+    <div class="cabecera-vista"><h2>Punto de venta</h2></div>
+
+    <div class="pos-layout" th:if="${sesion.puede('ventas', 'crear')}">
+        <div class="tarjeta">
+            <label>Buscar o escanear producto
+                <input type="text" id="buscar" placeholder="Nombre o código de barras (Enter para agregar)" autocomplete="off" autofocus>
+            </label>
+            <div id="lista-productos" style="max-height:460px;overflow:auto">
+                <div class="item-producto" th:each="p : ${productos}"
+                     th:classappend="${p.stock <= 0} ? 'sin-stock'"
+                     th:attr="data-id=${p.idProducto},data-nombre=${p.nombre},data-codigo=${p.codigoBarras},data-precio=${p.precioVenta},data-stock=${p.stock},data-minimo=${p.stockMinimo}">
+                    <div><strong th:text="${p.nombre}"></strong><br><span class="texto-suave" th:text="${p.presentacion != null ? p.presentacion : p.codigoBarras}"></span></div>
+                    <div class="alinear-derecha"><span th:text="${@fmt.soles(p.precioVenta)}"></span><br>
+                        <span class="badge" th:classappend="${p.estadoStock.color}" th:text="${p.stock > 0} ? 'Stock: ' + ${p.stock} : 'Sin stock'"></span></div>
+                </div>
+                <p class="texto-suave" th:if="${productos.isEmpty()}">No hay productos activos.</p>
+            </div>
+        </div>
+
+        <form class="tarjeta" id="form-venta" th:action="@{/ventas}" method="post">
+            <h3>Venta actual</h3>
+            <label>Cliente (DNI / RUC) <span class="texto-suave">opcional</span>
+                <input type="text" id="cliente-doc" maxlength="11" inputmode="numeric" placeholder="8 dígitos (DNI) u 11 (RUC)" autocomplete="off">
+            </label>
+            <input type="hidden" name="idCliente" id="id-cliente">
+            <div id="cliente-ficha"></div>
+
+            <div id="carrito"><p class="texto-suave">Carrito vacío. Haz clic en un producto para agregarlo.</p></div>
+            <div id="campos-carrito"></div>
+            <hr>
+            <label>Medio de pago</label>
+            <div class="medios-pago">
+                <label class="chip" th:each="m, i : ${metodos}" th:classappend="${i.first} ? 'activo'" style="margin:0">
+                    <input type="radio" name="metodoPago" th:value="${m}" th:checked="${i.first}" style="display:none"> <span th:text="${m}"></span>
+                </label>
+            </div>
+            <div class="panel-efectivo" id="panel-efectivo">
+                <label>Monto recibido (S/)
+                    <input type="number" name="montoRecibido" id="recibido" min="0" step="0.10" placeholder="0.00">
+                </label>
+                <div class="botones-rapidos" id="billetes"></div>
+                <div class="fila-vuelto"><span>Vuelto</span><strong id="vuelto">-</strong></div>
+                <p id="error-efectivo" class="texto-error"></p>
+            </div>
+            <div class="pos-total" id="total"></div>
+            <button type="submit" class="btn btn-primario btn-bloque" id="cobrar" disabled>Cobrar y guardar venta</button>
+        </form>
+    </div>
+
+    <div class="grilla-2col">
+        <div class="tarjeta">
+            <h3>Resumen de caja de hoy</h3>
+            <table>
+                <thead><tr><th>Medio de pago</th><th>Ventas</th><th>Total</th></tr></thead>
+                <tbody>
+                <tr th:each="c : ${caja}"><td th:text="${c.metodo_pago}"></td><td th:text="${c.cantidad}"></td><td th:text="${@fmt.soles(c.total)}"></td></tr>
+                </tbody>
+            </table>
+            <p class="texto-suave" th:if="${caja.isEmpty()}">Aún no hay ventas hoy en esta sede.</p>
+        </div>
+    </div>
+
+    <div class="tarjeta">
+        <h3>Ventas del día en esta sede</h3>
+        <div class="tabla-scroll">
+            <table>
+                <thead><tr><th>Comprobante</th><th>Hora</th><th>Cliente</th><th>Vendedor</th><th>Pago</th><th>Total</th><th>Vuelto</th><th>Estado</th><th>Acciones</th></tr></thead>
+                <tbody>
+                <tr th:each="v : ${ventas}" th:classappend="${v.anulada} ? 'fila-inactiva'">
+                    <td th:text="${v.numeroComprobante}"></td>
+                    <td th:text="${@fmt.hora(v.fechaHora)}"></td>
+                    <td th:text="${v.clienteNombre != null ? v.clienteNombre : 'Cliente varios'}"></td>
+                    <td th:text="${v.vendedorNombre}"></td>
+                    <td th:text="${v.metodoPago}"></td>
+                    <td class="sin-salto" th:text="${@fmt.soles(v.total)}"></td>
+                    <td class="sin-salto" th:text="${v.vuelto != null ? @fmt.soles(v.vuelto) : '-'}"></td>
+                    <td><span class="badge" th:classappend="${v.anulada} ? 'roja' : 'verde'" th:text="${v.estado}"></span></td>
+                    <td class="celda-acciones">
+                        <a class="btn btn-mini" th:href="@{/ventas/{id}/comprobante(id=${v.idVenta})}">Ver boleta</a>
+                        <form th:if="${sesion.puede('ventas','anular') and !v.anulada}" th:action="@{/ventas/{id}/anular(id=${v.idVenta})}" method="post"
+                              th:attr="data-confirmar='¿Anular ' + ${v.numeroComprobante} + '? El stock volverá a sus lotes.'">
+                            <button class="btn btn-mini btn-peligro-suave" type="submit">Anular</button>
+                        </form>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <p class="texto-suave" th:if="${ventas.isEmpty()}">Aún no hay ventas hoy en esta sede.</p>
+    </div>
+    <script th:src="@{/js/pos.js}"></script>
+</section>
+</body>
+</html>

@@ -1,0 +1,24 @@
+<html th:replace="~{fragments/layout :: pagina('Cliente', ~{::contenido})}" xmlns:th="http://www.thymeleaf.org">
+<body>
+<section th:fragment="contenido">
+    <div class="cabecera-vista"><h2 th:text="${cliente.idCliente == null} ? 'Nuevo cliente' : 'Editar cliente'"></h2></div>
+    <form class="tarjeta" style="max-width:640px" th:action="@{/clientes/guardar}" method="post" th:object="${cliente}">
+        <input type="hidden" th:field="*{idCliente}">
+        <div class="grilla-form">
+            <label>Tipo de documento
+                <select th:field="*{tipoDoc}"><option value="DNI">DNI</option><option value="RUC">RUC</option></select>
+            </label>
+            <label>N° de documento <input type="text" th:field="*{documento}" maxlength="11" required></label>
+            <label class="col-2">Nombres / Razón social <input type="text" th:field="*{nombre}" required></label>
+            <label>Teléfono <input type="text" th:field="*{telefono}"></label>
+            <label>Correo <input type="email" th:field="*{correo}"></label>
+            <label class="col-2">Dirección (opcional) <input type="text" th:field="*{direccion}"></label>
+        </div>
+        <div class="acciones-modal">
+            <a class="btn" th:href="@{/clientes}">Cancelar</a>
+            <button class="btn btn-primario" type="submit">Guardar</button>
+        </div>
+    </form>
+</section>
+</body>
+</html>

@@ -1,0 +1,25 @@
+<html th:replace="~{fragments/layout :: pagina('Rol', ~{::contenido})}" xmlns:th="http://www.thymeleaf.org">
+<body>
+<section th:fragment="contenido">
+    <div class="cabecera-vista"><h2 th:text="${rol.idRol == null} ? 'Nuevo rol' : 'Editar rol: ' + ${rol.nombre}"></h2></div>
+    <form class="tarjeta" th:action="@{/roles/guardar}" method="post">
+        <input type="hidden" name="idRol" th:value="${rol.idRol}">
+        <label style="max-width:400px">Nombre del rol <input type="text" name="nombre" th:value="${rol.nombre}" placeholder="Ej: Repartidor" required></label>
+        <p class="subtitulo">Marca las acciones permitidas en cada módulo:</p>
+        <div class="matriz-permisos">
+            <div class="grupo" th:each="m : ${modulos}">
+                <strong th:text="${#strings.toUpperCase(nombres[m.key])}"></strong>
+                <label class="check-linea" th:each="p : ${m.value}">
+                    <input type="checkbox" name="permisos" th:value="${p.idPermiso}" th:checked="${#sets.contains(marcados, p.clave)}">
+                    <span th:text="${p.descripcion}"></span>
+                </label>
+            </div>
+        </div>
+        <div class="acciones-modal">
+            <a class="btn" th:href="@{/roles}">Cancelar</a>
+            <button class="btn btn-primario" type="submit">Guardar</button>
+        </div>
+    </form>
+</section>
+</body>
+</html>

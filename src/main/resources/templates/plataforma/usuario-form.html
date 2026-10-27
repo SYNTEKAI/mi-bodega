@@ -1,0 +1,24 @@
+<html th:replace="~{fragments/layout :: pagina('Usuario interno', ~{::contenido})}" xmlns:th="http://www.thymeleaf.org">
+<body>
+<section th:fragment="contenido">
+    <div class="cabecera-vista"><h2 th:text="${usuario.idUsuarioInterno == null} ? 'Nuevo usuario interno' : 'Editar usuario interno'"></h2></div>
+    <form class="tarjeta" style="max-width:520px" th:action="@{/plataforma/usuarios/guardar}" method="post" th:object="${usuario}">
+        <input type="hidden" th:field="*{idUsuarioInterno}">
+        <label>Nombre completo <input type="text" th:field="*{nombre}" required></label>
+        <label>Correo <input type="email" th:field="*{correo}" required></label>
+        <label>Usuario (login) <input type="text" th:field="*{usuario}" th:readonly="${usuario.idUsuarioInterno != null}" required></label>
+        <label th:if="${usuario.idUsuarioInterno == null}">Contraseña inicial <input type="password" name="clave" placeholder="Mín. 8, letras y números" required></label>
+        <label>Rol interno
+            <select th:field="*{idRolInterno}">
+                <option th:each="r : ${roles}" th:if="${!r.principal or sesion.rolPrincipal}" th:value="${r.idRolInterno}" th:text="${r.nombre}"></option>
+            </select>
+        </label>
+        <p class="texto-suave" th:if="${usuario.idUsuarioInterno == null}">Deberá cambiar su contraseña en el primer ingreso.</p>
+        <div class="acciones-modal">
+            <a class="btn" th:href="@{/plataforma/usuarios}">Cancelar</a>
+            <button class="btn btn-primario" type="submit">Guardar</button>
+        </div>
+    </form>
+</section>
+</body>
+</html>

@@ -1,0 +1,67 @@
+<html th:replace="~{fragments/layout :: pagina('Kardex', ~{::contenido})}" xmlns:th="http://www.thymeleaf.org">
+<body>
+<section th:fragment="contenido">
+    <div class="cabecera-vista">
+        <h2>Kardex</h2>
+        <a class="btn btn-primario" th:if="${sesion.puede('kardex','exportar')}"
+           th:href="@{/kardex/excel(desde=${desde},hasta=${hasta},producto=${producto},categoria=${categoria},sede=${sede},tipo=${tipo},proveedor=${proveedor})}">Exportar a Excel</a>
+    </div>
+    <p class="subtitulo">Movimientos en unidades. El saldo es el stock acumulado del producto en esa sede.</p>
+    <form class="tarjeta filtros" method="get" th:action="@{/kardex}">
+        <label>Desde <input type="date" name="desde" th:value="${desde}"></label>
+        <label>Hasta <input type="date" name="hasta" th:value="${hasta}"></label>
+        <label>Producto
+            <select name="producto"><option value="">Todos</option>
+                <option th:each="p : ${productos}" th:value="${p.idProducto}" th:text="${p.nombre}" th:selected="${p.idProducto == producto}"></option></select>
+        </label>
+        <label>Categoría
+            <select name="categoria"><option value="">Todas</option>
+                <option th:each="c : ${categorias}" th:value="${c.idCategoria}" th:text="${c.nombre}" th:selected="${c.idCategoria == categoria}"></option></select>
+        </label>
+        <label th:if="${sesion.adminEmpresa or sesion.interno}">Sede
+            <select name="sede"><option value="">Todas</option>
+                <option th:each="sd : ${sedesActivas}" th:value="${sd.idSede}" th:text="${sd.nombre}" th:selected="${sd.idSede == sede}"></option></select>
+        </label>
+        <label>Tipo
+            <select name="tipo"><option value="">Todos</option>
+                <option th:each="t : ${ {'ENTRADA','SALIDA','AJUSTE'} }" th:value="${t}" th:text="${t}" th:selected="${t == tipo}"></option></select>
+        </label>
+        <label>Proveedor
+            <select name="proveedor"><option value="">Todos</option>
+                <option th:each="p : ${proveedores}" th:value="${p.idProveedor}" th:text="${p.razonSocial}" th:selected="${p.idProveedor == proveedor}"></option></select>
+        </label>
+        <button class="btn" type="submit">Filtrar</button>
+    </form>
+    <div class="tarjeta tabla-scroll tabla-kardex">
+        <p class="conteo" th:text="${total} + ' movimiento(s) - entradas ' + ${entradas} + ' - salidas ' + ${salidas}"></p>
+        <table>
+            <thead><tr><th>Fecha / hora</th><th>Tipo</th><th>Documento</th><th>Producto</th><th>Lote</th><th>Entrada</th><th>Salida</th><th>Saldo</th>
+                <th>Costo unit.</th><th>Costo total</th><th>Usuario</th><th>Sede</th><th>Proveedor</th></tr></thead>
+            <tbody>
+            <tr th:each="m : ${movimientos}">
+                <td class="sin-salto" th:text="${@fmt.fechaHora(m.fechaHora)}"></td>
+                <td><span class="badge" th:classappend="${m.tipo == 'ENTRADA'} ? 'verde' : (${m.tipo == 'SALIDA'} ? 'roja' : 'ambar')" th:text="${m.tipo}"></span></td>
+                <td th:text="${m.documento}"></td>
+                <td th:text="${m.productoNombre}"></td>
+                <td th:text="'L-' + ${m.idLote}"></td>
+                <td th:text="${m.entrada > 0} ? ${m.entrada} : ''"></td>
+                <td th:text="${m.salida > 0} ? ${m.salida} : ''"></td>
+                <td><strong th:text="${m.saldo}"></strong></td>
+                <td class="sin-salto" th:text="${@fmt.soles(m.costoUnitario)}"></td>
+                <td class="sin-salto" th:text="${@fmt.soles(m.costoTotal)}"></td>
+                <td th:text="${m.usuarioNombre}"></td>
+                <td th:text="${m.sedeNombre}"></td>
+                <td th:text="${m.proveedorNombre} ?: ''"></td>
+            </tr>
+            </tbody>
+        </table>
+        <p class="texto-suave centrado" th:if="${total == 0}">Sin movimientos con esos filtros.</p>
+        <div class="paginacion" th:if="${totalPaginas > 1}">
+            <a class="btn btn-mini" th:if="${pagina > 1}" th:href="@{/kardex(desde=${desde},hasta=${hasta},producto=${producto},categoria=${categoria},sede=${sede},tipo=${tipo},proveedor=${proveedor},pagina=${pagina - 1})}">Anterior</a>
+            <span class="texto-suave" th:text="'Página ' + ${pagina} + ' de ' + ${totalPaginas}"></span>
+            <a class="btn btn-mini" th:if="${pagina < totalPaginas}" th:href="@{/kardex(desde=${desde},hasta=${hasta},producto=${producto},categoria=${categoria},sede=${sede},tipo=${tipo},proveedor=${proveedor},pagina=${pagina + 1})}">Siguiente</a>
+        </div>
+    </div>
+</section>
+</body>
+</html>

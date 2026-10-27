@@ -1,0 +1,88 @@
+/* Estilos de la boleta de venta (siempre se ve como papel blanco) */
+
+/* ---- Base común de todas las boletas ---- */
+.ticket {
+  --acento: #1d6fd1; --ancho: 300px;
+  background: #fff; color: #111; width: 100%; max-width: var(--ancho);
+  font-family: "Courier New", monospace; font-size: 13px; line-height: 1.4;
+  padding: 16px 14px; border: 1px solid #e4e6eb; border-radius: 6px; box-shadow: 0 6px 18px rgba(0,0,0,.08);
+}
+.ticket h3 { margin: 2px 0 4px; font-size: 1.1em; }
+.ticket p { margin: 3px 0; }
+.ticket hr, .ticket .ticket-sep { border: none; border-top: 1px dashed #999; margin: 8px 0; }
+.ticket-suave { color: #555; font-size: .92em; }
+.ticket-legal { color: #666; font-size: .78em; }
+.ticket-titulo { font-weight: bold; margin-top: 6px !important; }
+.ticket-cliente { font-size: .92em; }
+.ticket-logo img { max-width: 100%; }
+.tabla-ticket { width: 100%; border-collapse: collapse; }
+.tabla-ticket td { border: none; padding: 2px 2px; color: #111; background: none !important; }
+.tabla-ticket td.alinear-derecha { white-space: nowrap; vertical-align: top; }
+.ticket table tbody tr:hover td { background: none; }
+
+/* ---- Modelo MODERNO ---- */
+.ticket-moderno { font-family: system-ui, "Segoe UI", sans-serif; }
+.moderno-cabecera { display: flex; gap: 10px; align-items: center; margin-bottom: 8px; }
+.moderno-nombre { font-size: 1.15em; }
+.moderno-encabezado { background: #f1f5fb; border-radius: 6px; padding: 4px 8px; text-align: center; }
+.moderno-numero { display: flex; justify-content: space-between; background: var(--acento); color: #fff; border-radius: 6px; padding: 6px 10px; margin: 8px 0; }
+.moderno-cant { display: inline-block; min-width: 22px; text-align: center; background: #eef2f7; border-radius: 5px; margin-right: 4px; font-weight: 600; }
+.moderno-items td { border-bottom: 1px solid #eee !important; padding: 5px 2px !important; }
+.moderno-total { display: flex; justify-content: space-between; align-items: center; border: 2px solid var(--acento); border-radius: 8px; padding: 8px 12px; margin: 10px 0; font-size: 1.1em; }
+.moderno-total strong { color: var(--acento); font-size: 1.2em; }
+
+/* ---- Modelo COMPACTO (58 mm) ---- */
+.ticket-compacto { --ancho: 230px; font-size: 11.5px; padding: 10px; line-height: 1.3; }
+
+/* ---- Modelo PROFESIONAL (recuadro de RUC) ---- */
+.ticket-profesional { --ancho: 340px; font-family: Arial, sans-serif; font-size: 12px; }
+.pro-cabecera { display: flex; justify-content: space-between; gap: 10px; align-items: flex-start; margin-bottom: 8px; }
+.pro-ruc { border: 2px solid #111; border-radius: 6px; padding: 6px 8px; text-align: center; font-size: .92em; min-width: 118px; }
+.pro-datos { width: 100%; border-collapse: collapse; margin-bottom: 8px; font-size: .95em; }
+.pro-datos td { padding: 2px 4px; border: none; color: #111; }
+.pro-datos td:first-child { color: #555; width: 60px; }
+.pro-items { width: 100%; border-collapse: collapse; }
+.pro-items th { background: #111; color: #fff; padding: 4px; font-size: .85em; text-transform: none; letter-spacing: 0; }
+.pro-items td { border: 1px solid #ddd; padding: 3px 4px; color: #111; }
+.pro-items td:nth-child(n+3) { text-align: right; white-space: nowrap; }
+.pro-items tfoot td { font-weight: bold; text-align: right; border-top: 2px solid #111; }
+
+/* ---- Modelo PERSONALIZADO: opciones del usuario ---- */
+.ticket-personalizado.fuente-sans { font-family: system-ui, "Segoe UI", sans-serif; }
+.ticket-personalizado.fuente-serif { font-family: Georgia, "Times New Roman", serif; }
+.ticket-personalizado h3 { color: var(--acento); }
+.ticket-personalizado.sep-linea .ticket-sep { border-top-style: solid; border-top-color: var(--acento); }
+.ticket-personalizado.sep-puntos .ticket-sep { border-top-style: dotted; }
+.ticket-personalizado.total-destacado .ticket-total { background: var(--acento); color: #fff; border-radius: 6px; padding: 6px 8px; }
+
+/* ---- Editor: layout y selector de modelos ---- */
+.comprobante-layout { display: grid; grid-template-columns: 1.15fr 1fr; gap: 14px; align-items: start; }
+.preview-fija { position: sticky; top: 12px; }
+.marco-preview { background: var(--fondo); border-radius: 10px; padding: 18px; display: flex; justify-content: center; }
+.grilla-modelos { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.modelo-boleta {
+  display: flex; flex-direction: column; align-items: center; gap: 3px; text-align: center; cursor: pointer;
+  background: var(--tarjeta); border: 2px solid var(--borde); border-radius: 10px; padding: 10px 8px; color: var(--texto);
+}
+.modelo-boleta span { font-size: .75em; color: var(--texto-suave); }
+.modelo-boleta.activo { border-color: var(--acento); box-shadow: 0 0 0 3px color-mix(in srgb, var(--acento) 20%, transparent); }
+.mini-ticket { display: flex !important; flex-direction: column; gap: 3px; width: 44px; height: 54px; background: #fff; border: 1px solid #ccc; border-radius: 4px; padding: 6px 5px; margin-bottom: 4px; }
+.mini-ticket i { display: block; height: 4px; border-radius: 2px; background: #bbb; }
+.mini-ticket i:first-child { width: 70%; margin: 0 auto; background: #777; }
+.mini-moderno i:first-child { margin: 0; background: #1d6fd1; }
+.mini-moderno i:last-child { background: #1d6fd1; }
+.mini-compacto { height: 40px; width: 34px; }
+.mini-profesional i:first-child { width: 45%; margin: 0 0 0 auto; background: #111; }
+.mini-personalizado i { background: linear-gradient(90deg, #eb6834, #1d6fd1); }
+.mini-importada i:nth-child(2) { width: 60%; background: #1baf7a; }
+.lista-campos { display: flex; flex-wrap: wrap; gap: 5px; }
+.chip-campo {
+  background: var(--fondo); border: 1px solid var(--borde); border-radius: 6px; padding: 3px 7px;
+  font-family: "Courier New", monospace; font-size: .78em; cursor: pointer; color: var(--texto);
+}
+.chip-campo:hover { border-color: var(--acento); color: var(--acento); }
+@media (max-width: 1000px) {
+  .comprobante-layout { grid-template-columns: 1fr; }
+  .preview-fija { position: static; }
+  .grilla-modelos { grid-template-columns: repeat(2, 1fr); }
+}

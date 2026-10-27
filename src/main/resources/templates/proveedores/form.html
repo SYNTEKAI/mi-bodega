@@ -1,0 +1,28 @@
+<html th:replace="~{fragments/layout :: pagina('Proveedor', ~{::contenido})}" xmlns:th="http://www.thymeleaf.org">
+<body>
+<section th:fragment="contenido">
+    <div class="cabecera-vista"><h2 th:text="${proveedor.idProveedor == null} ? 'Nuevo proveedor' : 'Editar proveedor'"></h2></div>
+    <form class="tarjeta" style="max-width:700px" th:action="@{/proveedores/guardar}" method="post" th:object="${proveedor}">
+        <input type="hidden" th:field="*{idProveedor}">
+        <input type="hidden" name="volver" th:value="${volver}">
+        <div class="grilla-form">
+            <label>Tipo de documento
+                <select th:field="*{tipoDoc}"><option value="RUC">RUC</option><option value="DNI">DNI</option></select>
+            </label>
+            <label>N° de documento <input type="text" th:field="*{documento}" maxlength="11" required></label>
+            <label class="col-2">Razón social <input type="text" th:field="*{razonSocial}" required></label>
+            <label>Nombre comercial <input type="text" th:field="*{nombreComercial}"></label>
+            <label>Contacto <input type="text" th:field="*{contacto}"></label>
+            <label>Teléfono <input type="text" th:field="*{telefono}"></label>
+            <label>Correo <input type="email" th:field="*{correo}"></label>
+            <label class="col-2">Dirección <input type="text" th:field="*{direccion}"></label>
+            <label class="col-2">Observaciones <input type="text" th:field="*{observaciones}" placeholder="Días de entrega, condiciones de pago"></label>
+        </div>
+        <div class="acciones-modal">
+            <a class="btn" th:href="${volver == 'recepcion'} ? @{/recepcion} : @{/proveedores}">Cancelar</a>
+            <button class="btn btn-primario" type="submit">Guardar</button>
+        </div>
+    </form>
+</section>
+</body>
+</html>

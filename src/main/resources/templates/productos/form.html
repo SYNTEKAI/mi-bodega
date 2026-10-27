@@ -1,0 +1,38 @@
+<html th:replace="~{fragments/layout :: pagina('Producto', ~{::contenido})}" xmlns:th="http://www.thymeleaf.org">
+<body>
+<section th:fragment="contenido">
+    <div class="cabecera-vista"><h2 th:text="${producto.idProducto == null} ? 'Nuevo producto' : 'Editar producto'"></h2></div>
+    <form class="tarjeta" style="max-width:760px" th:action="@{/productos/guardar}" method="post" th:object="${producto}">
+        <input type="hidden" th:field="*{idProducto}">
+        <div class="grilla-form">
+            <label class="col-2">Nombre <input type="text" th:field="*{nombre}" required></label>
+            <label>Código de barras <input type="text" th:field="*{codigoBarras}" required></label>
+            <label>Categoría
+                <select th:field="*{idCategoria}" required>
+                    <option value="">Elegir...</option>
+                    <option th:each="c : ${categorias}" th:value="${c.idCategoria}" th:text="${c.nombre}"></option>
+                </select>
+            </label>
+            <label>Marca <input type="text" th:field="*{marca}"></label>
+            <label>Presentación <input type="text" th:field="*{presentacion}" placeholder="Ej: botella 1 L, lata 400 g"></label>
+            <label>Unidad de stock
+                <select th:field="*{unidad}"><option th:each="u : ${unidades}" th:value="${u}" th:text="${u}"></option></select>
+            </label>
+            <label>Empaque habitual del proveedor
+                <select th:field="*{empaque}"><option th:each="e : ${empaques}" th:value="${e}" th:text="${e}"></option></select>
+            </label>
+            <label>Unidades por empaque <input type="number" th:field="*{unidadesPorEmpaque}" min="1"></label>
+            <label class="col-2">Descripción <input type="text" th:field="*{descripcion}"></label>
+            <label>Precio de compra por unidad (S/) <input type="number" th:field="*{precioCompra}" step="0.01" min="0"></label>
+            <label>Precio de venta (S/) <input type="number" th:field="*{precioVenta}" step="0.01" min="0" required></label>
+            <label>Stock mínimo (alerta) <input type="number" th:field="*{stockMinimo}" min="0"></label>
+        </div>
+        <p class="subtitulo">El stock no se ingresa aquí: entra por Recepción (en cajas o unidades) y se guarda en unidades.</p>
+        <div class="acciones-modal">
+            <a class="btn" th:href="@{/productos}">Cancelar</a>
+            <button class="btn btn-primario" type="submit">Guardar</button>
+        </div>
+    </form>
+</section>
+</body>
+</html>

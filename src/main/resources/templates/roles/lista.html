@@ -1,0 +1,39 @@
+<html th:replace="~{fragments/layout :: pagina('Roles y permisos', ~{::contenido})}" xmlns:th="http://www.thymeleaf.org">
+<body>
+<section th:fragment="contenido">
+    <div class="cabecera-vista">
+        <h2>Roles y permisos</h2>
+        <a class="btn btn-primario" th:if="${sesion.adminEmpresa and sesion.puede('roles','administrar')}" th:href="@{/roles/nuevo}">Nuevo rol</a>
+    </div>
+    <p class="subtitulo">Cada rol define qué acciones puede hacer en cada módulo (permiso módulo.acción).</p>
+    <div class="grilla-tarjetas">
+        <div class="tarjeta tarjeta-rol" th:each="r : ${roles}" th:classappend="${!r.activo} ? 'tarjeta-inactiva'">
+            <div class="fila-espaciada">
+                <h3><span th:text="${r.nombre}"></span> <span class="badge ambar" th:if="${r.protegido}">PROTEGIDO</span></h3>
+                <span class="badge" th:classappend="${r.activo} ? 'verde' : 'roja'" th:text="${r.activo} ? 'ACTIVO' : 'INACTIVO'"></span>
+            </div>
+            <p class="texto-suave" th:text="${r.usuarios} + ' usuario(s) - ' + ${r.totalPermisos} + ' permiso(s)'"></p>
+            <div class="lista-permisos">
+                <th:block th:each="m : ${modulos}">
+                    <span class="badge gris" th:if="${#sets.contains(permisosRol.get(r.idRol), m.key + '.ver')}" th:text="${nombres[m.key]}"></span>
+                </th:block>
+            </div>
+            <div class="acciones-tarjeta" th:if="${sesion.adminEmpresa and sesion.puede('roles','administrar')}">
+                <a class="btn btn-mini" th:unless="${r.protegido}" th:href="@{/roles/{id}/editar(id=${r.idRol})}">Editar permisos</a>
+                <form th:action="@{/roles/{id}/duplicar(id=${r.idRol})}" method="post"><button class="btn btn-mini" type="submit">Duplicar</button></form>
+                <th:block th:unless="${r.protegido}">
+                    <form th:action="@{/roles/{id}/estado(id=${r.idRol})}" method="post"
+                          th:attr="data-confirmar=${r.activo} ? '¿Desactivar el rol? Sus usuarios perderán acceso.' : '¿Activar el rol?'">
+                        <button class="btn btn-mini" type="submit" th:text="${r.activo} ? 'Desactivar' : 'Activar'"></button>
+                    </form>
+                    <form th:action="@{/roles/{id}/eliminar(id=${r.idRol})}" method="post" data-confirmar="¿Eliminar el rol?">
+                        <button class="btn btn-mini btn-peligro-suave" type="submit">Eliminar</button>
+                    </form>
+                </th:block>
+            </div>
+        </div>
+    </div>
+    <p class="texto-suave" th:unless="${sesion.adminEmpresa}">Solo el Administrador de la empresa puede administrar roles.</p>
+</section>
+</body>
+</html>

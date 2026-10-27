@@ -1,0 +1,92 @@
+<html th:replace="~{fragments/layout :: pagina('Reportes', ~{::contenido})}" xmlns:th="http://www.thymeleaf.org">
+<body>
+<section th:fragment="contenido">
+    <div class="cabecera-vista">
+        <h2>Reportes de ventas</h2>
+        <a class="btn btn-primario" th:if="${sesion.puede('reportes','exportar')}"
+           th:href="@{/reportes/excel(desde=${desde},hasta=${hasta},sede=${sede},vendedor=${vendedor},categoria=${categoria},producto=${producto},pago=${pago},vista=${vista})}">Exportar a Excel</a>
+    </div>
+    <form class="tarjeta filtros" method="get" th:action="@{/reportes}">
+        <input type="hidden" name="vista" th:value="${vista}">
+        <label>Desde <input type="date" name="desde" th:value="${desde}"></label>
+        <label>Hasta <input type="date" name="hasta" th:value="${hasta}"></label>
+        <label>Sede
+            <select name="sede"><option value="">Todas</option>
+                <option th:each="sd : ${sedesActivas}" th:value="${sd.idSede}" th:text="${sd.nombre}" th:selected="${sd.idSede == sede}"></option></select>
+        </label>
+        <label>Vendedor
+            <select name="vendedor"><option value="">Todos</option>
+                <option th:each="u : ${vendedores}" th:value="${u.idUsuario}" th:text="${u.nombre}" th:selected="${u.idUsuario == vendedor}"></option></select>
+        </label>
+        <label>Categoría
+            <select name="categoria"><option value="">Todas</option>
+                <option th:each="c : ${categorias}" th:value="${c.idCategoria}" th:text="${c.nombre}" th:selected="${c.idCategoria == categoria}"></option></select>
+        </label>
+        <label>Producto
+            <select name="producto"><option value="">Todos</option>
+                <option th:each="p : ${productos}" th:value="${p.idProducto}" th:text="${p.nombre}" th:selected="${p.idProducto == producto}"></option></select>
+        </label>
+        <label>Pago
+            <select name="pago"><option value="">Todos</option>
+                <option th:each="m : ${metodos}" th:value="${m}" th:text="${m}" th:selected="${m == pago}"></option></select>
+        </label>
+        <button class="btn" type="submit">Filtrar</button>
+    </form>
+
+    <div class="grilla-kpi">
+        <div class="tarjeta kpi"><span class="kpi-titulo">VENTAS FILTRADAS</span><span class="kpi-valor" th:text="${@fmt.soles(total)}"></span></div>
+        <div class="tarjeta kpi"><span class="kpi-titulo">COMPROBANTES</span><span class="kpi-valor" th:text="${comprobantes}"></span></div>
+        <div class="tarjeta kpi"><span class="kpi-titulo">UNIDADES VENDIDAS</span><span class="kpi-valor" th:text="${unidades}"></span></div>
+        <div class="tarjeta kpi"><span class="kpi-titulo">TICKET PROMEDIO</span><span class="kpi-valor" th:text="${@fmt.soles(ticketPromedio)}"></span></div>
+    </div>
+
+    <div class="pestanas">
+        <a class="pestana" th:classappend="${vista != 'ganancia'} ? 'activa'" style="text-decoration:none"
+           th:href="@{/reportes(desde=${desde},hasta=${hasta},sede=${sede},vendedor=${vendedor},categoria=${categoria},producto=${producto},pago=${pago},vista='detalle')}">Detalle de ventas</a>
+        <a class="pestana" th:classappend="${vista == 'ganancia'} ? 'activa'" style="text-decoration:none"
+           th:href="@{/reportes(desde=${desde},hasta=${hasta},sede=${sede},vista='ganancia')}">Ganancia por producto</a>
+    </div>
+
+    <div class="tarjeta tabla-scroll" th:if="${vista != 'ganancia'}">
+        <p class="conteo" th:text="${totalLineas} + ' línea(s) de venta' + (${totalLineas > 200} ? ' (se muestran las 200 más recientes; el Excel incluye todas)' : '')"></p>
+        <table>
+            <thead><tr><th>Fecha</th><th>Comprobante</th><th>Producto</th><th>Categoría</th><th>Vendedor</th><th>Sede</th><th>Cliente</th><th>Pago</th><th>Cant.</th><th>Precio</th><th>Total</th></tr></thead>
+            <tbody>
+            <tr th:each="l : ${lineas}">
+                <td class="sin-salto" th:text="${@fmt.fechaHora(l.fecha_hora)}"></td>
+                <td th:text="${l.numero_comprobante}"></td>
+                <td th:text="${l.producto}"></td>
+                <td th:text="${l.categoria}"></td>
+                <td th:text="${l.vendedor}"></td>
+                <td th:text="${l.sede}"></td>
+                <td th:text="${l.cliente}"></td>
+                <td th:text="${l.metodo_pago}"></td>
+                <td th:text="${l.cantidad}"></td>
+                <td class="sin-salto" th:text="${@fmt.soles(l.precio_unitario)}"></td>
+                <td class="sin-salto" th:text="${@fmt.soles(l.subtotal)}"></td>
+            </tr>
+            </tbody>
+            <tfoot><tr><td colspan="8"><strong>TOTAL</strong></td><td><strong th:text="${unidades}"></strong></td><td></td><td><strong th:text="${@fmt.soles(total)}"></strong></td></tr></tfoot>
+        </table>
+    </div>
+
+    <div class="tarjeta tabla-scroll" th:if="${vista == 'ganancia'}">
+        <p class="conteo">Ganancia = venta - (unidades x precio de compra). Ordenado por los más vendidos.</p>
+        <table>
+            <thead><tr><th>#</th><th>Producto</th><th>Categoría</th><th>Unidades</th><th>Venta</th><th>Costo</th><th>Ganancia</th></tr></thead>
+            <tbody>
+            <tr th:each="g, i : ${ganancias}">
+                <td th:text="${i.count}"></td>
+                <td><strong th:text="${g.producto}"></strong></td>
+                <td th:text="${g.categoria}"></td>
+                <td th:text="${g.unidades}"></td>
+                <td class="sin-salto" th:text="${@fmt.soles(g.venta)}"></td>
+                <td class="sin-salto" th:text="${@fmt.soles(g.costo)}"></td>
+                <td class="sin-salto"><strong th:text="${@fmt.soles(g.ganancia)}"></strong></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</section>
+</body>
+</html>

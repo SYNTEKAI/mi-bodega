@@ -1,0 +1,395 @@
+/* Estilos generales de Mi Bodega (tema claro/oscuro, layout, tablas y formularios) */
+
+:root {
+  --fondo: #f4f5f7;
+  --tarjeta: #ffffff;
+  --borde: #e4e6eb;
+  --texto: #1a1d23;
+  --texto-suave: #6b7280;
+  --verde: #15803d;  --verde-fondo: #dcfce7;
+  --rojo: #b91c1c;   --rojo-fondo: #fee2e2;
+  --ambar: #a16207;  --ambar-fondo: #fef3c7;
+  --gris-fondo: #e8eaee;
+  --azul: #1d4ed8;   --azul-fondo: #dbeafe;
+  --sube: #006300;   /* delta positivo */
+  --baja: #b91c1c;   /* delta negativo */
+  --campo: #ffffff;          /* fondo de inputs */
+  --fila-hover: #f5f7fa;     /* fila bajo el mouse */
+  --grafico-eje: #898781;    /* textos de ejes (Chart.js) */
+  --grafico-grilla: #e1e0d9; /* líneas de grilla (Chart.js) */
+  --sombra: 0 24px 60px rgba(0,0,0,.3);
+  color-scheme: light;
+}
+
+/* ---- Modo oscuro: se redefinen las mismas variables ---- */
+html[data-tema="oscuro"] {
+  --fondo: #0f1116;
+  --tarjeta: #181b22;
+  --borde: #2a2f39;
+  --texto: #e6e8ec;
+  --texto-suave: #9aa3af;
+  --verde: #4ade80;  --verde-fondo: #12331f;
+  --rojo: #f87171;   --rojo-fondo: #3b1717;
+  --ambar: #fbbf24;  --ambar-fondo: #3a2c0b;
+  --gris-fondo: #262b34;
+  --azul: #93c5fd;   --azul-fondo: #172554;
+  --sube: #4ade80;
+  --baja: #f87171;
+  --campo: #11141a;
+  --fila-hover: #1f242d;
+  --grafico-eje: #9aa3af;
+  --grafico-grilla: #2a2f39;
+  --sombra: 0 24px 60px rgba(0,0,0,.6);
+  color-scheme: dark;
+}
+
+/* ---- Tema por contexto ---- */
+body[data-contexto="plataforma"] {
+  --lateral: #16181d;         /* pizarra casi negra: nivel plataforma */
+  --lateral-hover: #262a33;
+  --acento: #4453c7;          /* índigo */
+  --acento-oscuro: #3543ab;
+  --topbar-linea: #4453c7;
+}
+body[data-contexto="empresa"] {
+  --lateral: #0f2f52;         /* azul corporativo: dentro de una empresa */
+  --lateral-hover: #1c4370;
+  --acento: #1d6fd1;
+  --acento-oscuro: #175cae;
+  --topbar-linea: #1d6fd1;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  background: var(--fondo); color: var(--texto); font-size: 14px;
+}
+.oculto { display: none !important; }
+.centrado { text-align: center; }
+.alinear-derecha { text-align: right; }
+.texto-suave { color: var(--texto-suave); font-size: 0.9em; font-weight: 400; }
+.texto-error { color: var(--rojo); min-height: 1.2em; font-size: 0.9em; }
+hr { border: none; border-top: 1px solid var(--borde); margin: 14px 0; }
+h2 { font-size: 1.25em; }
+h3 { font-size: 1em; margin-bottom: 10px; }
+
+/* ============================ LOGIN ============================ */
+.pantalla-login {
+  min-height: 100vh; display: flex; align-items: center; justify-content: center;
+  background: linear-gradient(135deg, #16181d 0%, #1d6fd1 100%); padding: 16px;
+}
+.tarjeta-login {
+  background: var(--tarjeta); border-radius: 14px; padding: 34px 30px;
+  width: 100%; max-width: 380px; box-shadow: 0 20px 50px rgba(0,0,0,.35);
+}
+.tarjeta-login .logo { font-size: 44px; text-align: center; }
+.tarjeta-login h1 { text-align: center; margin: 6px 0 4px; }
+.tarjeta-login .subtitulo { margin-bottom: 18px; }
+.ayuda-login { margin-top: 16px; font-size: 0.85em; color: var(--texto-suave); }
+.ayuda-login summary { cursor: pointer; }
+.ayuda-login p { margin: 4px 0; }
+
+/* ========================= LAYOUT GENERAL ====================== */
+.app { display: flex; min-height: 100vh; }
+.lateral {
+  width: 232px; background: var(--lateral); color: #e2e8f0;
+  display: flex; flex-direction: column; padding: 14px 10px; flex-shrink: 0;
+  transition: background .25s;
+}
+.lateral-marca { font-size: 1.1em; padding: 6px 10px 12px; }
+.lateral-contexto { padding: 0 10px 12px; }
+.etiqueta-nivel {
+  display: block; font-size: 0.68em; letter-spacing: 1px; line-height: 1.5;
+  color: #9aa4b5; border: 1px solid rgba(255,255,255,.14);
+  border-radius: 8px; padding: 7px 9px; font-weight: 600;
+}
+.menu { display: flex; flex-direction: column; gap: 2px; flex: 1; }
+.item-menu {
+  background: none; border: none; color: #c7cdd8; text-align: left;
+  padding: 9px 12px; border-radius: 8px; cursor: pointer; font-size: 0.95em;
+}
+.item-menu:hover { background: var(--lateral-hover); color: #fff; }
+.item-menu.activo { background: var(--acento); color: #fff; }
+.item-menu.volver { color: #9fc3f5; margin-bottom: 10px; border: 1px dashed rgba(255,255,255,.25); }
+.item-menu.salir { color: #f1a5a5; margin-top: 10px; }
+
+.zona-principal { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+
+/* ---- Barra superior: el CONTEXTO siempre visible ---- */
+.topbar {
+  background: var(--tarjeta); border-bottom: 1px solid var(--borde);
+  border-top: 3px solid var(--topbar-linea);
+  padding: 10px 22px; display: flex; justify-content: space-between;
+  align-items: center; gap: 12px; flex-wrap: wrap;
+}
+.topbar-izquierda { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.topbar-titulo { font-weight: 600; font-size: 1.02em; }
+.migas { font-size: 0.82em; color: var(--texto-suave); margin-top: 2px; }
+.migas span { margin: 0 4px; color: #b6bac2; }
+.migas a { color: var(--acento); cursor: pointer; text-decoration: none; }
+.migas a:hover { text-decoration: underline; }
+.topbar-derecha { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.topbar-usuario { text-align: right; font-size: 0.9em; display: flex; align-items: center; gap: 8px; }
+
+.avatar {
+  width: 40px; height: 40px; border-radius: 10px; flex-shrink: 0;
+  background: var(--acento); color: #fff; font-weight: 700;
+  display: flex; align-items: center; justify-content: center; font-size: 0.95em;
+}
+.plataforma-avatar { background: #16181d; }
+.avatar-logo { object-fit: contain; background: #fff; border: 1px solid var(--borde); }
+.fila-avatar { display: flex; align-items: center; gap: 10px; }
+/* Etiqueta "MODO EMPRESA" en la topbar: refuerza el cambio de contexto */
+.badge-contexto {
+  background: var(--acento); color: #fff; padding: 3px 9px;
+  border-radius: 999px; font-size: 0.62em; font-weight: 700; letter-spacing: .6px;
+  vertical-align: middle;
+}
+
+/* Franja de contexto "MODO EMPRESA" (Super Admin dentro de una empresa) */
+.banner-contexto {
+  background: var(--lateral); color: #dbe7f6;
+  padding: 8px 22px; font-size: 0.9em;
+  display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap;
+}
+.banner-contexto strong { color: #fff; }
+.banner-contexto .badge-contexto { font-size: 0.72em; margin-right: 6px; }
+.texto-banner-suave { color: #9fb6d3; }
+.btn-banner { background: transparent; color: #fff; border-color: rgba(255,255,255,.35); }
+.btn-banner:hover { background: rgba(255,255,255,.12); color: #fff; border-color: #fff; }
+
+.contenido { flex: 1; padding: 20px 22px; min-width: 0; }
+
+/* ===================== TARJETAS Y CABECERAS ==================== */
+.tarjeta {
+  background: var(--tarjeta); border: 1px solid var(--borde);
+  border-radius: 12px; padding: 16px 18px; margin-bottom: 14px;
+}
+.cabecera-vista {
+  display: flex; justify-content: space-between; align-items: center;
+  flex-wrap: wrap; gap: 10px; margin-bottom: 12px;
+}
+.subtitulo { color: var(--texto-suave); margin-bottom: 12px; }
+.fila-espaciada { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
+.conteo { color: var(--texto-suave); margin-bottom: 8px; font-size: 0.9em; }
+
+/* Los estilos de KPIs y gráficos viven en css/dashboard.css.
+   Las grillas de tarjetas, permisos y POS, en css/modulos.css.
+   La boleta y su previsualización, en css/comprobantes.css. */
+
+/* =========================== TABLAS ============================ */
+table { width: 100%; border-collapse: collapse; }
+th {
+  text-align: left; color: var(--texto-suave); font-size: 0.75em;
+  text-transform: uppercase; letter-spacing: .5px; padding: 8px 10px;
+  border-bottom: 2px solid var(--borde); white-space: nowrap;
+}
+td { padding: 9px 10px; border-bottom: 1px solid var(--borde); vertical-align: middle; }
+tr:last-child td { border-bottom: none; }
+tbody tr:hover td { background: var(--fila-hover); }
+.tabla-scroll { overflow-x: auto; }
+.fila-alerta td { background: var(--ambar-fondo) !important; }
+.fila-vencida td { background: var(--rojo-fondo) !important; }
+.fila-inactiva td { opacity: 0.55; }
+.celda-acciones { white-space: nowrap; }
+.tabla-detalle td { padding: 6px 8px; }
+.tabla-detalle td:first-child { color: var(--texto-suave); width: 45%; }
+
+/* =========================== BADGES ============================ */
+.badge { display: inline-block; padding: 3px 9px; border-radius: 999px; font-size: 0.75em; font-weight: 600; white-space: nowrap; }
+.badge.verde, .accion-verde { background: var(--verde-fondo); color: var(--verde); }
+.badge.roja,  .accion-roja  { background: var(--rojo-fondo);  color: var(--rojo); }
+.badge.ambar, .accion-ambar { background: var(--ambar-fondo); color: var(--ambar); }
+.badge.gris,  .accion-gris  { background: var(--gris-fondo);  color: var(--texto-suave); }
+.badge.azul,  .accion-azul  { background: var(--azul-fondo);  color: var(--azul); }
+
+/* =========================== BOTONES =========================== */
+.btn {
+  background: var(--tarjeta); border: 1px solid var(--borde); color: var(--texto);
+  padding: 8px 14px; border-radius: 8px; cursor: pointer; font-size: 0.92em;
+}
+.btn:hover { border-color: var(--acento); color: var(--acento); }
+.btn-primario { background: var(--acento); border-color: var(--acento); color: #fff; }
+.btn-primario:hover { background: var(--acento-oscuro); color: #fff; }
+.btn-peligro { background: var(--rojo); border-color: var(--rojo); color: #fff; }
+.btn-peligro:hover { background: #991b1b; color: #fff; }
+.btn-peligro-suave { color: var(--rojo); }
+.btn-peligro-suave:hover { border-color: var(--rojo); color: var(--rojo); background: var(--rojo-fondo); }
+.btn-bloque { width: 100%; margin-top: 10px; }
+.btn-mini { padding: 3px 9px; font-size: 0.82em; }
+
+/* ========================= FORMULARIOS ========================= */
+label { display: block; margin-bottom: 10px; font-size: 0.88em; color: var(--texto-suave); }
+input, select {
+  width: 100%; padding: 9px 11px; margin-top: 4px;
+  border: 1px solid var(--borde); border-radius: 8px; font-size: 1em;
+  background: var(--campo); color: var(--texto); font-family: inherit;
+}
+input:focus, select:focus { outline: 2px solid var(--acento); border-color: transparent; }
+input:disabled { background: var(--gris-fondo); color: var(--texto-suave); }
+.grilla-form { display: grid; grid-template-columns: 1fr 1fr; gap: 0 12px; }
+.grilla-form .col-2 { grid-column: span 2; }
+.fila-formulario { display: flex; gap: 10px; align-items: flex-end; flex-wrap: wrap; }
+.fila-formulario > * { flex: 1; min-width: 140px; }
+.fila-formulario .btn { flex: 0 0 auto; }
+.filtros { display: flex; gap: 10px; flex-wrap: wrap; align-items: flex-end; }
+.filtros label { flex: 1; min-width: 130px; margin-bottom: 0; }
+.filtro-buscar { min-width: 200px !important; }
+
+.chip-sede { background: var(--gris-fondo); border-radius: 999px; padding: 7px 14px; font-size: 0.88em; white-space: nowrap; }
+.selector-sede { width: auto; margin: 0; }
+.check-linea { display: flex; align-items: center; gap: 7px; margin: 0; color: var(--texto); font-size: 0.92em; }
+.check-linea input { width: auto; margin: 0; accent-color: var(--acento); }
+.filtro-check { align-self: center; flex: 0 0 auto !important; }
+
+/* ============================ MODAL ============================ */
+.modal-fondo {
+  position: fixed; inset: 0; background: rgba(15, 23, 42, .55);
+  display: flex; align-items: center; justify-content: center; z-index: 50; padding: 16px;
+}
+.modal {
+  background: var(--tarjeta); border-radius: 14px; padding: 22px;
+  width: 100%; max-width: 480px; max-height: 90vh; overflow-y: auto;
+  box-shadow: var(--sombra);
+}
+.modal h3 { margin-bottom: 14px; }
+.acciones-modal { display: flex; justify-content: flex-end; gap: 8px; margin-top: 16px; }
+
+/* ================= SIDEBAR COLAPSABLE (toggle ☰) ================ */
+.btn-toggle {
+  background: none; border: 1px solid var(--borde); border-radius: 8px;
+  font-size: 1.1em; padding: 6px 11px; cursor: pointer; color: var(--texto);
+  flex-shrink: 0;
+}
+.btn-toggle:hover { border-color: var(--acento); color: var(--acento); }
+/* Desktop: colapsado = solo íconos, con tooltip (atributo title) */
+body.menu-colapsado .lateral { width: 64px; padding: 14px 6px; }
+body.menu-colapsado .lateral-marca strong,
+body.menu-colapsado .lateral-contexto,
+body.menu-colapsado .texto-menu { display: none; }
+body.menu-colapsado .item-menu { text-align: center; padding: 10px 0; }
+body.menu-colapsado .icono-menu { margin: 0; }
+.icono-menu { margin-right: 8px; }
+
+/* ========================== RESPONSIVE ========================= */
+@media (max-width: 900px) {
+  .app { flex-direction: column; }
+  .lateral { width: 100%; }
+  .menu { flex-direction: row; flex-wrap: wrap; }
+  .contenido { padding: 14px; }
+  .topbar { padding: 10px 14px; }
+  .grilla-form { grid-template-columns: 1fr; }
+  .grilla-form .col-2 { grid-column: span 1; }
+  /* Móvil: el toggle oculta o muestra el menú completo */
+  body.menu-colapsado .lateral { display: none; }
+}
+
+/* ================== IMPRESIÓN: solo el ticket ================== */
+/* ================== IMPRESIÓN: solo el comprobante ================== */
+#zona-impresion { display: none; }
+@media print {
+  body.imprimiendo > *:not(#zona-impresion) { display: none !important; }
+  body.imprimiendo #zona-impresion { display: block; }
+  body.imprimiendo { background: #fff; }
+}
+
+/* ======================= COMPONENTES COMUNES (v4) ======================= */
+[hidden] { display: none !important; }
+fieldset.sin-borde { border: none; margin: 0; padding: 0; min-width: 0; }
+textarea {
+  width: 100%; padding: 9px 11px; margin-top: 4px; border: 1px solid var(--borde); border-radius: 8px;
+  background: var(--campo); color: var(--texto); font-family: inherit; font-size: 0.95em; resize: vertical;
+}
+textarea:focus { outline: 2px solid var(--acento); border-color: transparent; }
+input[readonly] { background: var(--gris-fondo); color: var(--texto-suave); cursor: not-allowed; }
+input[type="color"] { padding: 2px; height: 38px; }
+.btn:disabled { opacity: .45; cursor: not-allowed; pointer-events: none; }
+tfoot td { border-top: 2px solid var(--borde); border-bottom: none; }
+.enlace { color: var(--acento); cursor: pointer; text-decoration: underline; }
+.subtitulo-modal { font-size: 0.9em; margin: 14px 0 6px; color: var(--texto); font-weight: 600; }
+.grilla-3 { grid-template-columns: repeat(3, 1fr); }
+.fila-select-boton { display: flex; gap: 6px; align-items: center; }
+.fila-select-boton select { flex: 1; }
+.fila-select-boton .btn { margin-top: 4px; }
+
+/* Pestañas (Productos | Categorías) */
+.pestanas { display: flex; gap: 4px; margin-bottom: 12px; border-bottom: 1px solid var(--borde); }
+.pestana {
+  background: none; border: none; border-bottom: 3px solid transparent; color: var(--texto-suave);
+  padding: 9px 14px; cursor: pointer; font-size: 0.95em;
+}
+.pestana.activa { color: var(--acento); border-bottom-color: var(--acento); font-weight: 600; }
+
+/* Selector de apariencia ☀ 🌙 🖥 */
+.selector-tema { display: inline-flex; border: 1px solid var(--borde); border-radius: 999px; overflow: hidden; }
+.selector-tema button { background: none; border: none; padding: 6px 10px; cursor: pointer; font-size: 0.95em; color: var(--texto); }
+.selector-tema button.activo { background: var(--acento); color: #fff; }
+
+/* Usuario en la topbar (abre el perfil) */
+button.topbar-usuario {
+  background: none; border: 1px solid transparent; border-radius: 10px; padding: 4px 8px;
+  cursor: pointer; color: var(--texto); text-align: left; font-family: inherit;
+}
+button.topbar-usuario:hover { border-color: var(--borde); background: var(--fila-hover); }
+
+/* Avatares: foto o iniciales */
+.avatar-img { border-radius: 50%; object-fit: cover; flex-shrink: 0; border: 1px solid var(--borde); display: inline-block; vertical-align: middle; }
+.avatar-iniciales {
+  border-radius: 50%; background: var(--acento); color: #fff; font-weight: 700; flex-shrink: 0;
+  display: inline-flex; align-items: center; justify-content: center; vertical-align: middle;
+}
+
+/* Tarjeta del usuario al pie del sidebar */
+.lateral-usuario { margin-top: 8px; border-top: 1px solid rgba(255,255,255,.1); padding-top: 8px; }
+.tarjeta-usuario-lateral {
+  display: flex; align-items: center; gap: 9px; width: 100%; background: none; border: none;
+  color: #dbe2ea; text-align: left; padding: 6px 8px; border-radius: 8px; cursor: pointer; font-size: 0.85em;
+}
+.tarjeta-usuario-lateral:hover { background: var(--lateral-hover); }
+.tarjeta-usuario-lateral span span { color: #9aa4b5; }
+body.menu-colapsado .tarjeta-usuario-lateral { justify-content: center; padding: 6px 0; }
+
+/* Perfil y bloques de foto / logo */
+.perfil-cabecera { display: flex; gap: 14px; align-items: center; margin-bottom: 10px; }
+.perfil-cabecera h3 { margin-bottom: 2px; }
+.fila-foto { display: flex; gap: 8px; margin-bottom: 6px; }
+.bloque-logo { display: flex; gap: 14px; align-items: center; background: var(--fondo); border-radius: 10px; padding: 12px; margin-bottom: 12px; }
+.bloque-logo .btn { margin-top: 6px; }
+.lista-roles-perfil { display: flex; flex-direction: column; gap: 6px; }
+.fila-rol-perfil { display: flex; justify-content: space-between; align-items: center; padding: 8px 10px; border: 1px solid var(--borde); border-radius: 8px; }
+.fila-rol-perfil.activo { border-color: var(--acento); }
+.clave-temporal { font-size: 1.35em; letter-spacing: 2px; background: var(--gris-fondo); padding: 8px 14px; border-radius: 8px; display: inline-block; }
+
+/* Aviso flotante */
+#pila-avisos { position: fixed; bottom: 22px; right: 22px; z-index: 80; display: flex; flex-direction: column; gap: 8px; align-items: flex-end; }
+.aviso-flotante {
+  background: var(--texto); color: var(--tarjeta);
+  padding: 11px 18px; border-radius: 10px; box-shadow: var(--sombra); font-size: 0.92em; animation: aparecer .2s ease-out;
+}
+@keyframes aparecer { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+
+/* Paginación */
+.paginacion { display: flex; justify-content: flex-end; align-items: center; gap: 10px; margin-top: 12px; }
+
+/* Ficha automática del usuario en Auditoría */
+.ficha-usuario { display: flex; gap: 18px; align-items: center; flex-wrap: wrap; }
+.ficha-usuario > div { font-size: 0.92em; }
+
+/* Selector de columnas para exportar */
+.selector-columnas { display: flex; flex-wrap: wrap; gap: 6px 18px; }
+
+@media (max-width: 900px) {
+  .grilla-3 { grid-template-columns: 1fr; }
+  .topbar-derecha { width: 100%; }
+  button.topbar-usuario span { display: none; }
+}
+
+/* Filas de subtotal en tablas de reportes (igual que en el Excel) */
+.fila-subtotal td { background: var(--gris-fondo) !important; font-weight: 600; }
+@media (max-width: 600px) {
+  .kpi-valor { font-size: 1.15em !important; white-space: nowrap; }
+  #pila-avisos { left: 14px; right: 14px; bottom: 14px; }
+}
+
+/* Montos y fechas: nunca partir "S/" del número */
+.sin-salto { white-space: nowrap; }

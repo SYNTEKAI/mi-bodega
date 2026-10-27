@@ -1,0 +1,23 @@
+<html th:replace="~{fragments/layout :: pagina('Sede', ~{::contenido})}" xmlns:th="http://www.thymeleaf.org">
+<body>
+<section th:fragment="contenido">
+    <div class="cabecera-vista"><h2 th:text="${sede.idSede == null} ? 'Nueva sede' : 'Editar sede'"></h2></div>
+    <form class="tarjeta" style="max-width:640px" th:action="@{/sedes/guardar}" method="post" th:object="${sede}">
+        <input type="hidden" th:field="*{idSede}">
+        <div class="grilla-form">
+            <label>Nombre <input type="text" th:field="*{nombre}" placeholder="Ej: Sede Este" required></label>
+            <label>Código <input type="text" th:field="*{codigo}" placeholder="Ej: AND-04" required></label>
+            <label class="col-2">Dirección <input type="text" th:field="*{direccion}" required></label>
+            <label>Distrito <input type="text" th:field="*{distrito}" required></label>
+            <label>Provincia <input type="text" th:field="*{provincia}"></label>
+            <label>Responsable <input type="text" th:field="*{responsable}"></label>
+            <label>Teléfono <input type="text" th:field="*{telefono}"></label>
+        </div>
+        <div class="acciones-modal">
+            <a class="btn" th:href="@{/sedes}">Cancelar</a>
+            <button class="btn btn-primario" type="submit">Guardar</button>
+        </div>
+    </form>
+</section>
+</body>
+</html>

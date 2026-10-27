@@ -1,0 +1,40 @@
+<html th:replace="~{fragments/layout :: pagina('Sedes', ~{::contenido})}" xmlns:th="http://www.thymeleaf.org">
+<body>
+<section th:fragment="contenido">
+    <div class="cabecera-vista">
+        <h2>Sedes</h2>
+        <a class="btn btn-primario" th:if="${sesion.adminEmpresa and sesion.puede('sedes','crear')}" th:href="@{/sedes/nuevo}">Nueva sede</a>
+    </div>
+    <div class="tarjeta tabla-scroll">
+        <table>
+            <thead><tr><th>Código</th><th>Sede</th><th>Ubicación</th><th>Responsable</th><th>Teléfono</th><th>Creación</th><th>Estado</th><th>Acciones</th></tr></thead>
+            <tbody>
+            <tr th:each="s : ${sedes}" th:classappend="${!s.activo} ? 'fila-inactiva'">
+                <td class="texto-suave" th:text="${s.codigo}"></td>
+                <td><strong th:text="${s.nombre}"></strong></td>
+                <td><span th:text="${s.direccion}"></span><br><span class="texto-suave" th:text="${s.distrito} + ', ' + ${s.provincia}"></span></td>
+                <td th:text="${s.responsable} ?: '-'"></td>
+                <td th:text="${s.telefono} ?: '-'"></td>
+                <td th:text="${@fmt.fecha(s.fechaCreacion)}"></td>
+                <td><span class="badge" th:classappend="${s.activo} ? 'verde' : 'roja'" th:text="${s.activo} ? 'ACTIVA' : 'INACTIVA'"></span></td>
+                <td class="celda-acciones">
+                    <a class="btn btn-mini" th:href="@{/sedes/{id}(id=${s.idSede})}">Ver</a>
+                    <th:block th:if="${sesion.adminEmpresa and sesion.puede('sedes','editar')}">
+                        <a class="btn btn-mini" th:href="@{/sedes/{id}/editar(id=${s.idSede})}">Editar</a>
+                        <form th:action="@{/sedes/{id}/estado(id=${s.idSede})}" method="post" th:attr="data-confirmar=${s.activo} ? '¿Desactivar la sede? Su historial se conserva.' : '¿Reactivar la sede?'">
+                            <button class="btn btn-mini" type="submit" th:text="${s.activo} ? 'Desactivar' : 'Reactivar'"></button>
+                        </form>
+                        <form th:if="${sesion.puede('sedes','eliminar')}" th:action="@{/sedes/{id}/eliminar(id=${s.idSede})}" method="post"
+                              data-confirmar="¿Eliminar la sede? Si tiene usuarios, ventas o inventario se desactivará en su lugar.">
+                            <button class="btn btn-mini btn-peligro-suave" type="submit">Eliminar</button>
+                        </form>
+                    </th:block>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+        <p class="texto-suave" th:unless="${sesion.adminEmpresa}">Solo el Administrador puede editar o eliminar sedes.</p>
+    </div>
+</section>
+</body>
+</html>

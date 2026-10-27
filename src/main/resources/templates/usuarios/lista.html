@@ -1,0 +1,44 @@
+<html th:replace="~{fragments/layout :: pagina('Usuarios', ~{::contenido})}" xmlns:th="http://www.thymeleaf.org">
+<body>
+<section th:fragment="contenido">
+    <div class="cabecera-vista">
+        <h2>Usuarios</h2>
+        <a class="btn btn-primario" th:if="${sesion.puede('usuarios','crear')}" th:href="@{/usuarios/nuevo}">Nuevo usuario</a>
+    </div>
+    <div class="tarjeta tabla-scroll">
+        <table>
+            <thead><tr><th>Nombre</th><th>Usuario</th><th>Sede</th><th>Roles (activo en verde)</th><th>Último acceso</th><th>Estado</th><th>Acciones</th></tr></thead>
+            <tbody>
+            <tr th:each="u : ${usuarios}" th:classappend="${!u.activo} ? 'fila-inactiva'">
+                <td><strong th:text="${u.nombre}"></strong> <span class="badge ambar" th:if="${u.debeCambiarClave}">cambio de clave pendiente</span></td>
+                <td class="texto-suave" th:text="${u.usuario}"></td>
+                <td th:text="${u.sedeNombre}"></td>
+                <td><span class="badge verde" th:text="${u.rolActivoNombre}"></span> <span class="texto-suave" th:text="${u.roles}"></span></td>
+                <td class="texto-suave sin-salto" th:text="${@fmt.fechaHora(u.ultimoAcceso)}"></td>
+                <td><span class="badge" th:classappend="${u.activo} ? 'verde' : 'roja'" th:text="${u.estado}"></span></td>
+                <td class="celda-acciones">
+                    <a class="btn btn-mini" th:if="${sesion.puede('usuarios','editar')}" th:href="@{/usuarios/{id}/editar(id=${u.idUsuario})}">Editar</a>
+                    <th:block th:if="${sesion.puede('usuarios','restablecer_password')}">
+                        <form th:action="@{/usuarios/{id}/restablecer(id=${u.idUsuario})}" method="post" data-confirmar="¿Generar una contraseña temporal? Deberá cambiarla al ingresar.">
+                            <input type="hidden" name="forzarCambio" value="true">
+                            <button class="btn btn-mini" type="submit">Restablecer clave</button>
+                        </form>
+                        <form th:action="@{/usuarios/{id}/forzar(id=${u.idUsuario})}" method="post">
+                            <button class="btn btn-mini" type="submit">Forzar cambio</button>
+                        </form>
+                    </th:block>
+                    <form th:if="${sesion.puede('usuarios','editar')}" th:action="@{/usuarios/{id}/estado(id=${u.idUsuario})}" method="post">
+                        <button class="btn btn-mini" type="submit" th:text="${u.activo} ? 'Desactivar' : 'Activar'"></button>
+                    </form>
+                    <form th:if="${sesion.puede('usuarios','eliminar') and (sesion.interno or u.idUsuario != sesion.idUsuario)}" th:action="@{/usuarios/{id}/eliminar(id=${u.idUsuario})}" method="post"
+                          data-confirmar="¿Eliminar el usuario? Si tiene historial se desactivará en su lugar.">
+                        <button class="btn btn-mini btn-peligro-suave" type="submit">Eliminar</button>
+                    </form>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</section>
+</body>
+</html>

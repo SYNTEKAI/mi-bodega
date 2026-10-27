@@ -1,0 +1,140 @@
+/* Estilos de los modulos: empresas, roles, productos, recepcion, clientes y POS */
+
+/* ---- Grillas de tarjetas (empresas, roles) ---- */
+.grilla-tarjetas { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 14px; }
+.grilla-2col { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 14px; }
+.tarjeta-empresa h3 { font-size: 0.98em; margin-bottom: 2px; }
+.tarjeta-inactiva { opacity: 0.65; }
+.mini-stats { display: flex; gap: 16px; margin: 12px 0; flex-wrap: wrap; }
+.mini-stats div { display: flex; flex-direction: column; }
+.mini-stats strong { font-size: 1em; }
+.mini-stats span { color: var(--texto-suave); font-size: 0.75em; }
+
+.tarjeta-rol h3 { margin-bottom: 0; }
+.resumen-permisos { margin: 10px 0; display: flex; flex-wrap: wrap; gap: 4px; }
+.acciones-tarjeta { display: flex; gap: 6px; flex-wrap: wrap; border-top: 1px solid var(--borde); padding-top: 10px; align-items: center; }
+
+/* ---- Permisos granulares (modal de rol) ---- */
+.permisos-granulares { max-height: 46vh; overflow-y: auto; border: 1px solid var(--borde); border-radius: 10px; padding: 12px; }
+.grupo-permisos { padding: 8px 0; border-bottom: 1px solid var(--borde); }
+.grupo-permisos:last-child { border-bottom: none; }
+.grupo-permisos strong { font-size: 0.78em; letter-spacing: .5px; color: var(--texto-suave); }
+.lista-acciones { display: flex; flex-wrap: wrap; gap: 4px 18px; margin-top: 6px; }
+
+/* ---- Imágenes de producto ---- */
+.mini-imagen { width: 34px; height: 34px; object-fit: cover; border-radius: 8px; border: 1px solid var(--borde); display: block; }
+.mini-imagen-vacia { font-size: 1.3em; opacity: .6; }
+.imagen-detalle { max-width: 140px; max-height: 140px; object-fit: contain; border-radius: 10px; border: 1px solid var(--borde); display: block; margin: 0 auto 10px; }
+
+/* ---- Punto de venta ---- */
+.pos-layout { display: grid; grid-template-columns: 1.2fr 1fr; gap: 14px; margin-bottom: 14px; }
+.item-producto {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 10px 12px; border: 1px solid var(--borde); border-radius: 10px;
+  margin-top: 8px; cursor: pointer;
+}
+.item-producto:hover { border-color: var(--acento); background: var(--fila-hover); }
+.item-producto.sin-stock { opacity: 0.5; cursor: not-allowed; }
+.medios-pago { display: flex; gap: 8px; margin: 6px 0 12px; flex-wrap: wrap; }
+.chip {
+  background: var(--fondo); border: 1px solid var(--borde); border-radius: 999px;
+  padding: 7px 14px; cursor: pointer; font-size: 0.9em;
+}
+.chip.activo { background: var(--acento); border-color: var(--acento); color: #fff; }
+.pos-total { text-align: right; font-size: 1.25em; margin: 10px 0; }
+.celda-cantidad { white-space: nowrap; }
+.celda-cantidad strong { margin: 0 8px; }
+@media (max-width: 900px) { .pos-layout { grid-template-columns: 1fr; } }
+
+/* ======================= RECEPCIÓN / GUÍAS (v4) ======================= */
+.ficha-proveedor {
+  display: flex; flex-wrap: wrap; gap: 6px 22px; background: var(--fondo); border-radius: 10px;
+  padding: 10px 14px; font-size: 0.9em; margin-top: 4px;
+}
+.ficha-proveedor span span { margin-right: 4px; }
+.grilla-linea-recepcion { display: grid; grid-template-columns: 2.2fr 1.1fr 1fr 1fr 1fr 1fr; gap: 0 10px; }
+.resumen-linea {
+  background: var(--fondo); border-left: 4px solid var(--acento); border-radius: 8px;
+  padding: 10px 14px; margin: 4px 0 6px; font-size: 0.95em;
+}
+.total-unidades { color: var(--acento); font-size: 1.15em; }
+@media (max-width: 1100px) { .grilla-linea-recepcion { grid-template-columns: 1fr 1fr; } .grilla-linea-recepcion .col-producto { grid-column: span 2; } }
+
+/* Cargo de recepción (vista previa) */
+.cargo-cabecera { display: flex; gap: 12px; align-items: center; margin-bottom: 12px; }
+.cargo-cabecera > div:nth-child(2) { flex: 1; }
+.cargo-numero { text-align: center; border: 1.5px solid var(--acento); border-radius: 8px; padding: 6px 12px; font-size: 0.85em; }
+.cargo-bloques { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; background: var(--fondo); border-radius: 10px; padding: 12px; margin-bottom: 12px; font-size: 0.9em; }
+
+/* ======================= CLIENTES Y POS (v4) ======================= */
+.grilla-kpi-compacta { grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); }
+.kpi-valor-chico { font-size: 1em !important; }
+.lista-frecuentes { display: flex; flex-wrap: wrap; gap: 6px; }
+.historial-cliente { max-height: 260px; overflow-y: auto; }
+.ficha-cliente-pos {
+  display: flex; justify-content: space-between; align-items: center; gap: 10px;
+  background: var(--verde-fondo); border-radius: 10px; padding: 8px 12px; margin: -4px 0 10px; font-size: 0.9em;
+}
+.ficha-cliente-pos.nuevo { background: var(--fondo); }
+.panel-efectivo { background: var(--fondo); border-radius: 10px; padding: 10px 12px; margin-bottom: 8px; }
+.panel-efectivo label { margin-bottom: 6px; }
+.botones-rapidos { display: flex; gap: 6px; flex-wrap: wrap; }
+.fila-vuelto { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; font-size: 1.1em; }
+.fila-vuelto strong { color: var(--verde); font-size: 1.25em; }
+.confirmacion-venta { text-align: center; }
+.confirmacion-venta .tabla-detalle { text-align: left; margin-top: 8px; }
+.icono-ok {
+  width: 54px; height: 54px; border-radius: 50%; background: var(--verde-fondo); color: var(--verde);
+  font-size: 1.8em; display: flex; align-items: center; justify-content: center; margin: 0 auto 8px;
+}
+.vuelto-grande { color: var(--verde); font-size: 1.2em; }
+.acciones-iconos { flex-wrap: wrap; }
+
+/* ================================================================
+   v5 · ESTADOS DE STOCK, POS Y CORRECCIÓN DE RECEPCIONES
+   ================================================================ */
+/* Aviso de que se está corrigiendo una recepción ya confirmada */
+.aviso-correccion {
+  background: var(--azul-fondo); color: var(--azul);
+  border-left: 4px solid var(--azul); border-radius: 8px;
+  padding: 10px 14px; margin: 0 0 14px; font-size: 0.92em;
+}
+/* Línea del detalle que se está editando */
+.fila-editando td { background: var(--ambar-fondo) !important; }
+
+/* POS: línea que pide más de lo que hay y aviso de stock bajo */
+.linea-excede td { background: var(--rojo-fondo) !important; }
+.aviso-stock-bajo { color: var(--ambar); font-size: 0.8em; font-weight: 600; }
+.input-cantidad { width: 70px; padding: 4px 6px; text-align: center; }
+
+/* Tablas pequeñas dentro de modales (vista previa, antes/después) */
+.tabla-compacta { width: 100%; border-collapse: collapse; font-size: 0.88em; }
+.tabla-compacta th, .tabla-compacta td { padding: 5px 7px; border-bottom: 1px solid var(--borde); text-align: left; }
+.tabla-compacta th { color: var(--texto-suave); font-weight: 600; }
+.grilla-antes-despues { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 10px 0; }
+.grilla-antes-despues h4 { margin: 0 0 6px; font-size: 0.9em; }
+.lista-cambios { margin: 6px 0; padding-left: 18px; font-size: 0.9em; }
+.lista-motivos { display: flex; flex-direction: column; gap: 8px; margin: 10px 0 14px; }
+
+/* Historial de una recepción */
+.linea-tiempo { list-style: none; padding: 0 0 0 14px; margin: 10px 0 16px; border-left: 2px solid var(--borde); }
+.linea-tiempo li { position: relative; padding: 4px 0 8px 10px; font-size: 0.9em; }
+.linea-tiempo li::before {
+  content: ""; position: absolute; left: -20px; top: 9px; width: 10px; height: 10px;
+  border-radius: 50%; background: var(--acento);
+}
+.bloque-modificacion { margin: 10px 0; padding: 12px 14px; }
+.detalle-json {
+  background: var(--gris-fondo); padding: 10px; border-radius: 8px;
+  font-size: 0.8em; max-height: 300px; overflow: auto; white-space: pre-wrap;
+}
+@media (max-width: 700px) {
+  .grilla-antes-despues { grid-template-columns: 1fr; }
+}
+/* Guías: tabla ancha → los 6 íconos de acción se acomodan en 2 filas de 3 */
+#tabla-guias .celda-acciones { white-space: normal; width: 128px; min-width: 128px; }
+#tabla-guias .celda-acciones .btn-mini { padding-left: 7px; padding-right: 7px; }
+#tabla-guias .celda-acciones .btn-mini { margin: 1px 0; }
+#tabla-guias td { font-size: 0.95em; }
+#tabla-guias th { white-space: normal; vertical-align: bottom; }
+#tabla-guias th, #tabla-guias td { padding-left: 8px; padding-right: 8px; }

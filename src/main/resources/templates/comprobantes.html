@@ -1,0 +1,58 @@
+<html th:replace="~{fragments/layout :: pagina('Comprobantes', ~{::contenido})}" xmlns:th="http://www.thymeleaf.org">
+<body>
+<section th:fragment="contenido">
+    <div class="cabecera-vista"><h2>Diseño de la boleta</h2></div>
+    <p class="subtitulo">Elige el modelo y los datos que se imprimen. El POS usa este diseño.</p>
+    <div class="comprobante-layout">
+        <form th:action="@{/comprobantes}" method="post" th:object="${config}" id="form-boleta">
+            <fieldset class="sin-borde" th:disabled="${!sesion.puede('comprobantes','configurar')}">
+                <div class="tarjeta">
+                    <h3>Modelo</h3>
+                    <div class="lista-acciones">
+                        <label class="check-linea" th:each="p : ${plantillas}"><input type="radio" th:field="*{plantilla}" th:value="${p}"> <span th:text="${p}"></span></label>
+                    </div>
+                    <label>Ancho del papel
+                        <select th:field="*{ancho}"><option value="80">80 mm</option><option value="58">58 mm</option></select>
+                    </label>
+                </div>
+                <div class="tarjeta">
+                    <h3>Textos</h3>
+                    <div class="grilla-form">
+                        <label class="col-2">Encabezado <input type="text" th:field="*{encabezado}" maxlength="100"></label>
+                        <label class="col-2">Mensaje comercial <input type="text" th:field="*{mensaje}" maxlength="150" placeholder="Ej: Síguenos en redes"></label>
+                        <label>Pie de página <input type="text" th:field="*{pie}" maxlength="100"></label>
+                        <label>Notas legales <input type="text" th:field="*{notas}" maxlength="200"></label>
+                    </div>
+                </div>
+                <div class="tarjeta">
+                    <h3>Datos visibles</h3>
+                    <div class="lista-acciones">
+                        <label class="check-linea"><input type="checkbox" th:field="*{mostrarLogo}"> Logo de la empresa</label>
+                        <label class="check-linea"><input type="checkbox" th:field="*{mostrarRazonSocial}"> Razón social</label>
+                        <label class="check-linea"><input type="checkbox" th:field="*{mostrarDireccion}"> Dirección</label>
+                        <label class="check-linea"><input type="checkbox" th:field="*{mostrarCliente}"> Cliente</label>
+                        <label class="check-linea"><input type="checkbox" th:field="*{mostrarCajero}"> Cajero</label>
+                        <label class="check-linea"><input type="checkbox" th:field="*{mostrarVuelto}"> Recibido y vuelto</label>
+                    </div>
+                </div>
+                <div class="acciones-modal" th:if="${sesion.puede('comprobantes','configurar')}">
+                    <button class="btn btn-primario" type="submit">Guardar diseño</button>
+                </div>
+            </fieldset>
+            <p class="texto-suave" th:unless="${sesion.puede('comprobantes','configurar')}">Tu rol solo permite ver esta configuración.</p>
+        </form>
+        <div class="tarjeta preview-fija">
+            <h3>Vista previa (última venta)</h3>
+            <div id="vista-previa" th:fragment="vistaPrevia">
+                <div class="marco-preview" th:if="${venta != null}">
+                    <div th:replace="~{fragments/ticket :: ticket(${venta}, ${empresa}, ${config})}"></div>
+                </div>
+                <p class="texto-suave" th:if="${venta == null}">Registra una venta para ver la vista previa.</p>
+            </div>
+            <p class="texto-suave centrado">La vista previa cambia al instante. El diseño se aplica al POS cuando presionas Guardar diseño.</p>
+        </div>
+    </div>
+    <script th:src="@{/js/comprobantes.js}"></script>
+</section>
+</body>
+</html>

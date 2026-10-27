@@ -1,0 +1,21 @@
+<html th:replace="~{fragments/layout :: pagina('Producto', ~{::contenido})}" xmlns:th="http://www.thymeleaf.org">
+<body>
+<section th:fragment="contenido">
+    <div class="cabecera-vista"><h2 th:text="${producto.nombre}"></h2><a class="btn" th:href="@{/productos}">&larr; Productos</a></div>
+    <div class="tarjeta" style="max-width:680px">
+        <table class="tabla-detalle">
+            <tr><td>Código de barras</td><td th:text="${producto.codigoBarras}"></td></tr>
+            <tr><td>Categoría / Marca</td><td th:text="${producto.categoriaNombre} + ' / ' + (${producto.marca} ?: '-')"></td></tr>
+            <tr><td>Descripción</td><td th:text="${producto.descripcion} ?: '-'"></td></tr>
+            <tr><td>Presentación</td><td th:text="(${producto.presentacion} ?: '-') + ' (se cuenta por ' + ${producto.unidad} + ')'"></td></tr>
+            <tr><td>Empaque habitual</td><td th:text="${producto.empaque} + ' de ' + ${producto.unidadesPorEmpaque} + ' unidades'"></td></tr>
+            <tr><td>Precio compra / venta</td><td th:text="${@fmt.soles(producto.precioCompra)} + ' / ' + ${@fmt.soles(producto.precioVenta)} + ' (ganancia ' + ${@fmt.soles(producto.margen)} + ' por unidad)'"></td></tr>
+            <tr><td>Stock mínimo</td><td th:text="${producto.stockMinimo}"></td></tr>
+            <tr><td>Estado</td><td th:text="${producto.activo} ? 'Activo' : 'Inactivo'"></td></tr>
+            <tr th:each="st : ${stockSedes}"><td th:text="'Stock en ' + ${st.nombre}"></td><td th:text="${st.stock} + ' ' + ${producto.unidad}"></td></tr>
+        </table>
+        <p class="texto-suave">El stock no se edita aquí: entra por Recepción y se corrige con un ajuste en Inventario.</p>
+    </div>
+</section>
+</body>
+</html>

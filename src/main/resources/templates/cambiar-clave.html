@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cambiar contraseña - Mi Bodega</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body data-contexto="empresa">
+<div class="pantalla-login">
+    <form class="tarjeta-login" th:action="@{/cambiar-clave}" method="post">
+        <h1>Cambia tu contraseña</h1>
+        <p class="subtitulo centrado">El administrador restableció tu acceso. Crea una contraseña nueva para continuar.</p>
+        <div class="mensaje mensaje-error" th:if="${error}" th:text="${error}"></div>
+        <label>Nueva contraseña <input type="password" name="nueva" placeholder="Mínimo 8 caracteres, letras y números" required></label>
+        <label>Confirmar contraseña <input type="password" name="confirmacion" required></label>
+        <button type="submit" class="btn btn-primario btn-bloque">Guardar y entrar</button>
+    </form>
+    <form th:action="@{/logout}" method="post" style="text-align:center;margin-top:10px">
+        <button type="submit" class="btn">Salir</button>
+    </form>
+</div>
+</body>
+</html>

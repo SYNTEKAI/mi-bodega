@@ -1,0 +1,39 @@
+/* Estilos propios de la version web (mensajes, formularios en linea y paginas sueltas) */
+
+.mensaje { padding: 10px 14px; border-radius: 8px; margin-bottom: 14px; font-size: 0.92em; }
+.mensaje-ok { background: var(--verde-fondo); color: var(--verde); }
+.mensaje-error { background: var(--rojo-fondo); color: var(--rojo); }
+
+form.en-linea { display: inline; }
+.celda-acciones form { display: inline; }
+.celda-acciones a.btn, .acciones-tarjeta a.btn { text-decoration: none; display: inline-block; }
+a.btn { text-decoration: none; display: inline-block; }
+.lateral a.item-menu { text-decoration: none; display: block; }
+.lateral form { margin: 0; }
+.lateral button.item-menu { width: 100%; text-align: left; background: none; border: none; cursor: pointer; font: inherit; }
+.boton-tema { background: none; border: 1px solid var(--borde); border-radius: 999px; padding: 6px 12px; cursor: pointer; color: var(--texto); }
+
+.lista-permisos { display: flex; flex-wrap: wrap; gap: 4px; margin: 8px 0; }
+.matriz-permisos { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 10px; }
+.matriz-permisos .grupo { border: 1px solid var(--borde); border-radius: 8px; padding: 10px; }
+.matriz-permisos .grupo strong { display: block; margin-bottom: 6px; font-size: 0.85em; }
+
+.tabla-lineas input, .tabla-lineas select { margin: 0; min-width: 70px; }
+.tabla-lineas td { padding: 6px 4px; }
+.tabla-lineas .sel-producto { min-width: 230px; }
+.tabla-lineas input[type=number] { width: 95px; }
+.tabla-kardex { font-size: 0.86em; }
+.tabla-kardex td { padding: 7px 6px; }
+.tarjeta-empresa .acciones-tarjeta select { width: auto; padding: 4px 6px; font-size: 0.85em; }
+
+.pagina-impresion { max-width: 860px; margin: 0 auto; }
+.clave-temporal { font-size: 1.6em; letter-spacing: 2px; background: var(--gris-fondo); padding: 8px 16px; border-radius: 8px; }
+
+.paginacion { display: flex; gap: 8px; align-items: center; justify-content: center; margin-top: 12px; }
+
+@media print {
+  .lateral, .topbar, .no-imprimir, .banner-contexto, .mensaje { display: none !important; }
+  .contenido { padding: 0; }
+  body { background: #fff; }
+  .tarjeta { box-shadow: none; border: none; }
+}

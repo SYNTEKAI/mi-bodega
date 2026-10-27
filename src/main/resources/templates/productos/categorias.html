@@ -1,0 +1,40 @@
+<html th:replace="~{fragments/layout :: pagina('Categorías', ~{::contenido})}" xmlns:th="http://www.thymeleaf.org">
+<body>
+<section th:fragment="contenido">
+    <div class="cabecera-vista"><h2>Categorías de productos</h2><a class="btn" th:href="@{/productos}">&larr; Productos</a></div>
+    <form class="tarjeta fila-formulario" th:action="@{/productos/categorias/guardar}" method="post">
+        <label>Nueva categoría <input type="text" name="nombre" placeholder="Ej: Congelados" required></label>
+        <button class="btn btn-primario" type="submit">Agregar</button>
+    </form>
+    <div class="tarjeta tabla-scroll">
+        <table>
+            <thead><tr><th>Categoría</th><th>Productos</th><th>Estado</th><th>Acciones</th></tr></thead>
+            <tbody>
+            <tr th:each="c : ${categorias}" th:classappend="${!c.activo} ? 'fila-inactiva'">
+                <td>
+                    <form th:if="${editar == c.idCategoria}" th:action="@{/productos/categorias/guardar}" method="post" class="fila-formulario">
+                        <input type="hidden" name="id" th:value="${c.idCategoria}">
+                        <input type="text" name="nombre" th:value="${c.nombre}" required>
+                        <button class="btn btn-mini btn-primario" type="submit">Guardar</button>
+                    </form>
+                    <strong th:unless="${editar == c.idCategoria}" th:text="${c.nombre}"></strong>
+                </td>
+                <td th:text="${c.productos}"></td>
+                <td><span class="badge" th:classappend="${c.activo} ? 'verde' : 'roja'" th:text="${c.activo} ? 'ACTIVA' : 'INACTIVA'"></span></td>
+                <td class="celda-acciones">
+                    <a class="btn btn-mini" th:href="@{/productos/categorias(editar=${c.idCategoria})}">Editar</a>
+                    <form th:action="@{/productos/categorias/{id}/estado(id=${c.idCategoria})}" method="post">
+                        <button class="btn btn-mini" type="submit" th:text="${c.activo} ? 'Desactivar' : 'Activar'"></button>
+                    </form>
+                    <form th:action="@{/productos/categorias/{id}/eliminar(id=${c.idCategoria})}" method="post" data-confirmar="¿Eliminar la categoría?">
+                        <button class="btn btn-mini btn-peligro-suave" type="submit">Eliminar</button>
+                    </form>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+        <p class="texto-suave">Una categoría inactiva no aparece al crear productos, pero sus productos la conservan.</p>
+    </div>
+</section>
+</body>
+</html>

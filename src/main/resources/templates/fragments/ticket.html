@@ -1,0 +1,62 @@
+<!-- Boleta de venta. Se usa en el POS, en la ficha del cliente y en la vista previa del diseño. -->
+<div xmlns:th="http://www.thymeleaf.org" th:fragment="ticket(venta, empresa, config)"
+     class="ticket" th:classappend="${config.plantilla == 'MODERNO'} ? 'ticket-moderno' : (${config.plantilla == 'COMPACTO' or config.ancho == '58'} ? 'ticket-compacto')">
+
+    <!-- Logo -->
+    <div class="ticket-logo centrado" th:if="${config.mostrarLogo and empresa.tieneLogo and config.plantilla != 'MODERNO'}">
+        <img th:src="@{/archivos/empresa/{id}/logo(id=${empresa.idEmpresa})}" th:style="${config.plantilla == 'COMPACTO'} ? 'height:40px' : 'height:56px'" alt="logo">
+    </div>
+
+    <!-- Cabecera MODERNO: logo a la izquierda y numero resaltado -->
+    <th:block th:if="${config.plantilla == 'MODERNO'}">
+        <div class="moderno-cabecera">
+            <img th:if="${config.mostrarLogo and empresa.tieneLogo}" th:src="@{/archivos/empresa/{id}/logo(id=${empresa.idEmpresa})}" style="height:48px" alt="logo">
+            <div><strong class="moderno-nombre" th:text="${empresa.nombreMostrar}"></strong><br>
+                <small><span th:if="${config.mostrarRazonSocial}" th:text="${empresa.razonSocial}"></span><br>
+                    RUC <span th:text="${empresa.ruc}"></span>
+                    <span th:if="${config.mostrarDireccion and empresa.direccion != null}"><br><span th:text="${empresa.direccion}"></span></span></small></div>
+        </div>
+        <p class="moderno-encabezado" th:if="${config.encabezado != null and !config.encabezado.isBlank()}" th:text="${config.encabezado}"></p>
+        <div class="moderno-numero"><span>BOLETA</span><strong th:text="${venta.numeroComprobante}"></strong></div>
+    </th:block>
+
+    <!-- Cabecera CLASICO y COMPACTO -->
+    <th:block th:unless="${config.plantilla == 'MODERNO'}">
+        <p class="centrado" th:if="${config.encabezado != null and !config.encabezado.isBlank()}"><strong th:text="${config.encabezado}"></strong></p>
+        <h3 class="centrado" th:text="${empresa.nombreMostrar}"></h3>
+        <p class="centrado ticket-suave">
+            <span th:if="${config.mostrarRazonSocial and config.plantilla != 'COMPACTO'}"><span th:text="${empresa.razonSocial}"></span><br></span>
+            RUC <span th:text="${empresa.ruc}"></span>
+            <span th:if="${config.mostrarDireccion and empresa.direccion != null and config.plantilla != 'COMPACTO'}"><br><span th:text="${empresa.direccion}"></span></span>
+        </p>
+        <p class="centrado ticket-titulo" th:text="'BOLETA DE VENTA ' + ${venta.numeroComprobante}"></p>
+    </th:block>
+
+    <p class="centrado ticket-suave">
+        <span th:text="${venta.sedeNombre}"></span> - <span th:text="${@fmt.fechaHora(venta.fechaHora)}"></span>
+        <span th:if="${config.mostrarCajero}"><br>Cajero: <span th:text="${venta.vendedorNombre}"></span></span>
+    </p>
+    <p class="ticket-cliente" th:if="${config.mostrarCliente}">Cliente:
+        <span th:if="${venta.clienteNombre != null}" th:text="${venta.clienteNombre} + ' - ' + ${venta.clienteTipoDoc} + ' ' + ${venta.clienteDocumento}"></span>
+        <span th:if="${venta.clienteNombre == null}">Cliente varios</span>
+    </p>
+    <hr class="ticket-sep">
+    <table class="tabla-ticket" th:classappend="${config.plantilla == 'MODERNO'} ? 'moderno-items'">
+        <tr th:each="d : ${venta.detalles}">
+            <td th:text="${d.cantidad} + ' x ' + ${d.productoNombre}"></td>
+            <td class="alinear-derecha" th:text="${@fmt.soles(d.subtotal)}"></td>
+        </tr>
+    </table>
+    <hr class="ticket-sep">
+    <div class="moderno-total" th:if="${config.plantilla == 'MODERNO'}"><span>TOTAL</span><strong th:text="${@fmt.soles(venta.total)}"></strong></div>
+    <p class="alinear-derecha ticket-total" th:unless="${config.plantilla == 'MODERNO'}"><strong th:text="'TOTAL: ' + ${@fmt.soles(venta.total)}"></strong></p>
+    <p>Pago: <span th:text="${venta.metodoPago}"></span></p>
+    <table class="tabla-ticket" th:if="${config.mostrarVuelto and venta.montoRecibido != null}">
+        <tr><td>Recibido</td><td class="alinear-derecha" th:text="${@fmt.soles(venta.montoRecibido)}"></td></tr>
+        <tr><td>Vuelto</td><td class="alinear-derecha" th:text="${@fmt.soles(venta.vuelto)}"></td></tr>
+    </table>
+    <p class="centrado" th:if="${config.pie != null}" th:text="${config.pie}"></p>
+    <p class="centrado ticket-suave" th:if="${config.mensaje != null and config.plantilla != 'COMPACTO'}" th:text="${config.mensaje}"></p>
+    <p class="centrado ticket-legal" th:if="${config.notas != null and config.plantilla != 'COMPACTO'}" th:text="${config.notas}"></p>
+    <p class="centrado ticket-legal" th:if="${venta.anulada}"><strong>*** COMPROBANTE ANULADO ***</strong></p>
+</div>

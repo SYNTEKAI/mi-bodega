@@ -1,0 +1,36 @@
+<html th:replace="~{fragments/layout :: pagina('Usuarios del sistema', ~{::contenido})}" xmlns:th="http://www.thymeleaf.org">
+<body>
+<section th:fragment="contenido">
+    <div class="cabecera-vista">
+        <h2>Usuarios del sistema</h2>
+        <a class="btn btn-primario" th:if="${sesion.puede('usuarios_sistema','crear')}" th:href="@{/plataforma/usuarios/nuevo}">Nuevo usuario interno</a>
+    </div>
+    <p class="subtitulo">Equipo interno de la plataforma (no pertenece a ninguna empresa cliente).</p>
+    <div class="tarjeta tabla-scroll">
+        <table>
+            <thead><tr><th>Nombre</th><th>Correo</th><th>Usuario</th><th>Rol interno</th><th>Estado</th><th>Último acceso</th><th>Acciones</th></tr></thead>
+            <tbody>
+            <tr th:each="u : ${usuarios}" th:classappend="${!u.activo} ? 'fila-inactiva'">
+                <td><strong th:text="${u.nombre}"></strong> <span class="badge ambar" th:if="${u.debeCambiarClave}">cambio pendiente</span></td>
+                <td class="texto-suave" th:text="${u.correo}"></td>
+                <td th:text="${u.usuario}"></td>
+                <td><span class="badge gris" th:text="${u.rolNombre}"></span></td>
+                <td><span class="badge" th:classappend="${u.activo} ? 'verde' : 'roja'" th:text="${u.estado}"></span></td>
+                <td class="texto-suave sin-salto" th:text="${@fmt.fechaHora(u.ultimoAcceso)}"></td>
+                <td class="celda-acciones">
+                    <a class="btn btn-mini" th:if="${sesion.puede('usuarios_sistema','editar') and (!u.rolPrincipal or sesion.rolPrincipal)}" th:href="@{/plataforma/usuarios/{id}/editar(id=${u.idUsuarioInterno})}">Editar</a>
+                    <form th:if="${sesion.puede('usuarios_sistema','restablecer_password') and !u.rolPrincipal}" th:action="@{/plataforma/usuarios/{id}/restablecer(id=${u.idUsuarioInterno})}" method="post"
+                          data-confirmar="¿Generar una contraseña temporal?">
+                        <button class="btn btn-mini" type="submit">Restablecer clave</button>
+                    </form>
+                    <form th:if="${sesion.puede('usuarios_sistema','editar') and !u.rolPrincipal}" th:action="@{/plataforma/usuarios/{id}/estado(id=${u.idUsuarioInterno})}" method="post">
+                        <button class="btn btn-mini" type="submit" th:text="${u.activo} ? 'Desactivar' : 'Activar'"></button>
+                    </form>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</section>
+</body>
+</html>

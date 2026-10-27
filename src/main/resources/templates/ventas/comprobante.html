@@ -1,0 +1,17 @@
+<html th:replace="~{fragments/layout :: pagina('Boleta de venta', ~{::contenido})}" xmlns:th="http://www.thymeleaf.org">
+<body>
+<section th:fragment="contenido">
+    <div class="cabecera-vista no-imprimir">
+        <h2 th:text="'Boleta ' + ${venta.numeroComprobante}"></h2>
+        <div>
+            <a class="btn" th:if="${volverCliente != null}" th:href="@{/clientes/{id}(id=${volverCliente})}">&larr; Volver al cliente</a>
+            <a class="btn" th:if="${volverCliente == null}" th:href="@{/ventas}">Nueva venta</a>
+            <button class="btn btn-primario" type="button" onclick="window.print()">Imprimir</button>
+        </div>
+    </div>
+    <div class="marco-preview">
+        <div th:replace="~{fragments/ticket :: ticket(${venta}, ${empresa}, ${config})}"></div>
+    </div>
+</section>
+</body>
+</html>

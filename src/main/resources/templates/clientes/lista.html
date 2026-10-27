@@ -1,0 +1,43 @@
+<html th:replace="~{fragments/layout :: pagina('Clientes', ~{::contenido})}" xmlns:th="http://www.thymeleaf.org">
+<body>
+<section th:fragment="contenido">
+    <div class="cabecera-vista">
+        <h2>Clientes</h2>
+        <a class="btn btn-primario" th:if="${sesion.puede('clientes','crear')}" th:href="@{/clientes/nuevo}">Nuevo cliente</a>
+    </div>
+    <form class="tarjeta filtros" method="get" th:action="@{/clientes}">
+        <label class="filtro-buscar">Buscar <input type="text" name="texto" th:value="${texto}" placeholder="DNI, RUC o nombre"></label>
+        <label>Tipo
+            <select name="tipo"><option value="">Todos</option>
+                <option th:selected="${tipo == 'DNI'}">DNI</option><option th:selected="${tipo == 'RUC'}">RUC</option></select>
+        </label>
+        <button class="btn" type="submit">Filtrar</button>
+    </form>
+    <div class="tarjeta tabla-scroll">
+        <p class="conteo" th:text="${clientes.size()} + ' cliente(s) - ordenados por total comprado'"></p>
+        <table>
+            <thead><tr><th>Documento</th><th>Nombre / Razón social</th><th>Teléfono</th><th>Compras</th><th>Total comprado</th><th>Última compra</th><th>Acciones</th></tr></thead>
+            <tbody>
+            <tr th:each="c : ${clientes}">
+                <td class="texto-suave sin-salto" th:text="${c.tipoDoc} + ' ' + ${c.documento}"></td>
+                <td><strong th:text="${c.nombre}"></strong></td>
+                <td th:text="${c.telefono != null ? c.telefono : '-'}"></td>
+                <td th:text="${c.compras}"></td>
+                <td class="sin-salto" th:text="${@fmt.soles(c.totalComprado)}"></td>
+                <td class="sin-salto" th:text="${@fmt.fecha(c.ultimaCompra)}"></td>
+                <td class="celda-acciones">
+                    <a class="btn btn-mini" th:href="@{/clientes/{id}(id=${c.idCliente})}">Ver</a>
+                    <a class="btn btn-mini" th:if="${sesion.puede('clientes','editar')}" th:href="@{/clientes/{id}/editar(id=${c.idCliente})}">Editar</a>
+                    <form th:if="${sesion.puede('clientes','eliminar')}" th:action="@{/clientes/{id}/eliminar(id=${c.idCliente})}" method="post"
+                          th:attr="data-confirmar='¿Eliminar a ' + ${c.nombre} + '?'">
+                        <button class="btn btn-mini btn-peligro-suave" type="submit">Eliminar</button>
+                    </form>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+        <p class="texto-suave centrado" th:if="${clientes.isEmpty()}">No hay clientes con esos filtros.</p>
+    </div>
+</section>
+</body>
+</html>

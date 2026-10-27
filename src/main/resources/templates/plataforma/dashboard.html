@@ -1,0 +1,68 @@
+<html th:replace="~{fragments/layout :: pagina('Dashboard global', ~{::contenido})}" xmlns:th="http://www.thymeleaf.org">
+<body>
+<section th:fragment="contenido">
+    <div class="cabecera-vista"><h2>Panel de la plataforma</h2></div>
+    <div class="grilla-kpi">
+        <div class="tarjeta kpi"><span class="kpi-titulo">EMPRESAS ACTIVAS</span><span class="kpi-valor" th:text="${t.empresas_activas}"></span>
+            <span class="kpi-sub" th:text="${t.empresas_prueba} + ' en prueba - ' + ${t.empresas_inactivas} + ' suspendidas/inactivas'"></span></div>
+        <div class="tarjeta kpi"><span class="kpi-titulo">SEDES</span><span class="kpi-valor" th:text="${t.sedes}"></span><span class="kpi-sub" th:text="${t.sedes_activas} + ' activas'"></span></div>
+        <div class="tarjeta kpi"><span class="kpi-titulo">USUARIOS DE EMPRESAS</span><span class="kpi-valor" th:text="${t.usuarios}"></span><span class="kpi-sub" th:text="${t.usuarios_activos} + ' activos'"></span></div>
+        <div class="tarjeta kpi"><span class="kpi-titulo">USUARIOS INTERNOS</span><span class="kpi-valor" th:text="${t.internos}"></span></div>
+        <div class="tarjeta kpi"><span class="kpi-titulo">VENTAS HOY</span><span class="kpi-valor" th:text="${t.ventas_hoy}"></span><span class="kpi-sub">en toda la plataforma</span></div>
+        <div class="tarjeta kpi"><span class="kpi-titulo">CONECTADOS HOY</span><span class="kpi-valor" th:text="${t.conectados_hoy}"></span><span class="kpi-sub">usuarios con LOGIN hoy</span></div>
+    </div>
+    <div class="grilla-graficos">
+        <div class="tarjeta tarjeta-grafico ancho-2"><h3>Ventas diarias de la plataforma (últimos 30 días)</h3><div class="lienzo"><canvas id="g-ventas"></canvas></div></div>
+        <div class="tarjeta tarjeta-grafico"><h3>Ventas por empresa (30 días)</h3><div class="lienzo"><canvas id="g-empresas"></canvas></div></div>
+    </div>
+    <div class="grilla-2col">
+        <div class="tarjeta">
+            <h3>Empresas con más actividad</h3>
+            <table>
+                <thead><tr><th>#</th><th>Empresa</th><th>Ventas 30d</th><th>Acciones</th><th>Usuarios</th><th>Estado</th></tr></thead>
+                <tbody>
+                <tr th:each="r, i : ${ranking}">
+                    <td th:text="${i.count}"></td><td><strong th:text="${r.empresa}"></strong></td>
+                    <td th:text="${r.ventas}"></td><td th:text="${r.acciones}"></td><td th:text="${r.usuarios}"></td>
+                    <td><span class="badge" th:classappend="${r.estado == 'ACTIVA'} ? 'verde' : (${r.estado == 'EN PRUEBA'} ? 'ambar' : 'roja')" th:text="${r.estado}"></span></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="tarjeta">
+            <h3>Alertas</h3>
+            <th:block th:each="e : ${empresas}">
+                <p class="linea-alerta" th:if="${e.estado == 'SUSPENDIDA' or e.estado == 'INACTIVA'}" th:text="${e.razonSocial} + ' está ' + ${#strings.toLowerCase(e.estado)} + ': sus usuarios no pueden ingresar.'"></p>
+                <p class="linea-alerta" th:if="${e.estado == 'EN PRUEBA'}" th:text="${e.razonSocial} + ' está en período de prueba.'"></p>
+                <p class="linea-alerta" th:if="${e.operable and e.sedes == 0}" th:text="${e.razonSocial} + ' aún no tiene sedes configuradas.'"></p>
+            </th:block>
+        </div>
+    </div>
+    <div class="tarjeta tabla-scroll">
+        <h3>Actividad reciente del sistema</h3>
+        <table>
+            <thead><tr><th>Fecha</th><th>Empresa</th><th>Usuario</th><th>Acción</th><th>Descripción</th></tr></thead>
+            <tbody>
+            <tr th:each="a : ${actividad}">
+                <td class="sin-salto" th:text="${@fmt.fechaHora(a.fechaHora)}"></td><td th:text="${a.empresaNombre}"></td><td th:text="${a.usuarioNombre}"></td>
+                <td><span class="badge" th:classappend="'accion-' + ${a.color}" th:text="${a.accion}"></span></td><td th:text="${a.descripcion}"></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+    <script th:src="@{/lib/chart.umd.js}"></script>
+    <script th:inline="javascript">
+        const ventasDia = /*[[${ventasDia}]]*/ [];
+        const ranking = /*[[${ranking}]]*/ [];
+        const azul = "#2a78d6";
+        const opciones = { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } };
+        new Chart(document.getElementById("g-ventas"), { type: "line",
+            data: { labels: ventasDia.map(x => x.dia), datasets: [{ data: ventasDia.map(x => x.total), borderColor: azul, backgroundColor: "rgba(42,120,214,0.08)", fill: true, tension: 0.3, pointRadius: 0 }] },
+            options: opciones });
+        new Chart(document.getElementById("g-empresas"), { type: "bar",
+            data: { labels: ranking.map(x => x.empresa), datasets: [{ data: ranking.map(x => x.ventas), backgroundColor: azul, borderRadius: 4, maxBarThickness: 36 }] },
+            options: opciones });
+    </script>
+</section>
+</body>
+</html>

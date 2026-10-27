@@ -1,0 +1,40 @@
+<html th:replace="~{fragments/layout :: pagina('Mi perfil', ~{::contenido})}" xmlns:th="http://www.thymeleaf.org">
+<body>
+<section th:fragment="contenido">
+    <div class="cabecera-vista"><h2>Mi perfil</h2></div>
+    <div class="grilla-2col">
+        <div class="tarjeta">
+            <div class="perfil-cabecera">
+                <span class="avatar-iniciales" style="width:64px;height:64px;font-size:24px" th:text="${sesion.iniciales}"></span>
+                <div>
+                    <strong th:text="${sesion.nombre}"></strong><br>
+                    <span class="texto-suave" th:text="'@' + ${sesion.usuario}"></span><br>
+                    <span class="texto-suave" th:text="${sesion.interno} ? 'Equipo de la plataforma' : ${sesion.empresaNombre}"></span>
+                </div>
+            </div>
+            <h4 class="subtitulo-modal">Roles asignados</h4>
+            <p th:if="${sesion.interno}"><span class="badge verde" th:text="${sesion.rolNombre}"></span></p>
+            <div class="lista-roles-perfil" th:unless="${sesion.interno}">
+                <div class="fila-rol-perfil" th:each="r : ${sesion.rolesAsignados}" th:classappend="${r.idRol == sesion.idRol} ? 'activo'">
+                    <span><span th:text="${r.nombre}"></span> <span class="badge verde" th:if="${r.idRol == sesion.idRol}">ACTIVO</span></span>
+                    <form th:if="${r.idRol != sesion.idRol and r.activo}" th:action="@{/perfil/rol}" method="post" class="en-linea">
+                        <input type="hidden" name="idRol" th:value="${r.idRol}">
+                        <button class="btn btn-mini" type="submit">Usar este rol</button>
+                    </form>
+                </div>
+            </div>
+            <p class="texto-suave">Cada acción queda registrada en la auditoría con el rol activo en ese momento.</p>
+        </div>
+        <div class="tarjeta">
+            <h3>Cambiar contraseña</h3>
+            <form th:action="@{/perfil/clave}" method="post">
+                <label>Contraseña actual <input type="password" name="actual" required></label>
+                <label>Nueva contraseña <input type="password" name="nueva" placeholder="Mínimo 8 caracteres, letras y números" required></label>
+                <label>Confirmar nueva contraseña <input type="password" name="confirmacion" required></label>
+                <button type="submit" class="btn btn-primario">Guardar contraseña</button>
+            </form>
+        </div>
+    </div>
+</section>
+</body>
+</html>

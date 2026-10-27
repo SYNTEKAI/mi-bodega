@@ -1,0 +1,27 @@
+<html th:replace="~{fragments/layout :: pagina('Importar productos', ~{::contenido})}" xmlns:th="http://www.thymeleaf.org">
+<body>
+<section th:fragment="contenido">
+    <div class="cabecera-vista"><h2>Importar productos desde Excel</h2><a class="btn" th:href="@{/productos}">&larr; Productos</a></div>
+    <div class="tarjeta" style="max-width:720px">
+        <p>1. Descarga la plantilla y llena una fila por producto (no cambies el orden de las columnas).</p>
+        <p><a class="btn" th:href="@{/productos/plantilla}">Descargar plantilla .xlsx</a></p>
+        <p class="texto-suave">Columnas: codigo_barras, nombre, categoria, marca, presentacion, unidad, precio_compra, precio_venta, stock_minimo.
+            Si la categoría no existe se crea. El stock no se importa: entra por Recepción.</p>
+        <hr>
+        <p>2. Sube el archivo:</p>
+        <form th:action="@{/productos/importar}" method="post" enctype="multipart/form-data" class="fila-formulario">
+            <input type="file" name="archivo" accept=".xlsx" required>
+            <button class="btn btn-primario" type="submit">Importar</button>
+        </form>
+    </div>
+    <div class="tarjeta" style="max-width:720px" th:if="${resultado != null}">
+        <h3>Resultado</h3>
+        <p><strong th:text="${resultado.importados}"></strong> producto(s) importados.</p>
+        <div th:if="${!resultado.errores.isEmpty()}">
+            <p class="texto-error" th:text="${resultado.errores.size()} + ' fila(s) con error (no se cargaron):'"></p>
+            <ul><li th:each="e : ${resultado.errores}" th:text="${e}"></li></ul>
+        </div>
+    </div>
+</section>
+</body>
+</html>

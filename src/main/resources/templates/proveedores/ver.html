@@ -1,0 +1,19 @@
+<html th:replace="~{fragments/layout :: pagina('Proveedor', ~{::contenido})}" xmlns:th="http://www.thymeleaf.org">
+<body>
+<section th:fragment="contenido">
+    <div class="cabecera-vista"><h2 th:text="${proveedor.razonSocial}"></h2><a class="btn" th:href="@{/proveedores}">&larr; Proveedores</a></div>
+    <div class="tarjeta" style="max-width:640px">
+        <table class="tabla-detalle">
+            <tr><td th:text="${proveedor.tipoDoc}"></td><td th:text="${proveedor.documento}"></td></tr>
+            <tr><td>Nombre comercial</td><td th:text="${proveedor.nombreComercial} ?: '-'"></td></tr>
+            <tr><td>Contacto</td><td th:text="${proveedor.contacto} ?: '-'"></td></tr>
+            <tr><td>Teléfono / Correo</td><td th:text="(${proveedor.telefono} ?: '-') + ' / ' + (${proveedor.correo} ?: '-')"></td></tr>
+            <tr><td>Dirección</td><td th:text="${proveedor.direccion} ?: '-'"></td></tr>
+            <tr><td>Observaciones</td><td th:text="${proveedor.observaciones} ?: '-'"></td></tr>
+            <tr><td>Guías recibidas</td><td><a class="enlace" th:href="@{/guias(proveedor=${proveedor.idProveedor})}" th:text="${proveedor.guias}"></a></td></tr>
+            <tr><td>Estado</td><td><span class="badge" th:classappend="${proveedor.activo} ? 'verde' : 'roja'" th:text="${proveedor.activo} ? 'ACTIVO' : 'INACTIVO'"></span></td></tr>
+        </table>
+    </div>
+</section>
+</body>
+</html>

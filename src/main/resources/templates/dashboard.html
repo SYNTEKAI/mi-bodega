@@ -1,0 +1,65 @@
+<html th:replace="~{fragments/layout :: pagina('Dashboard', ~{::contenido})}" xmlns:th="http://www.thymeleaf.org">
+<body>
+<section th:fragment="contenido">
+    <div class="cabecera-vista"><h2>Dashboard</h2></div>
+
+    <div class="grilla-kpi">
+        <div class="tarjeta kpi"><span class="kpi-titulo">VENTAS DE HOY</span>
+            <span class="kpi-valor" th:text="${@fmt.soles(k.ventasHoy)}"></span>
+            <span class="kpi-sub" th:text="${k.ticketsHoy} + ' tickets'"></span></div>
+        <div class="tarjeta kpi"><span class="kpi-titulo">VENTAS DEL MES</span>
+            <span class="kpi-valor" th:text="${k.ticketsMes} + ' tickets'"></span>
+            <span class="kpi-sub"><span th:class="${k.variacionTickets >= 0} ? 'delta-sube' : 'delta-baja'" th:text="${k.variacionTickets} + '%'"></span> vs mes anterior</span></div>
+        <div class="tarjeta kpi"><span class="kpi-titulo">INGRESOS DEL MES</span>
+            <span class="kpi-valor" th:text="${@fmt.soles(k.ingresosMes)}"></span>
+            <span class="kpi-sub"><span th:class="${k.variacionIngresos >= 0} ? 'delta-sube' : 'delta-baja'" th:text="${k.variacionIngresos} + '%'"></span> vs mes anterior</span></div>
+        <div class="tarjeta kpi"><span class="kpi-titulo">TICKET PROMEDIO</span>
+            <span class="kpi-valor" th:text="${@fmt.soles(k.ticketPromedio)}"></span><span class="kpi-sub">este mes</span></div>
+        <div class="tarjeta kpi"><span class="kpi-titulo">PRODUCTOS VENDIDOS</span>
+            <span class="kpi-valor" th:text="${k.unidadesMes} + ' unid.'"></span><span class="kpi-sub">este mes</span></div>
+        <div class="tarjeta kpi"><span class="kpi-titulo">USUARIOS ACTIVOS</span>
+            <span class="kpi-valor" th:text="${k.usuariosActivos}"></span><span class="kpi-sub">en la empresa</span></div>
+        <div class="tarjeta kpi" th:classappend="${k.stockBajo + k.sinStock > 0} ? 'alerta'"><span class="kpi-titulo">STOCK CRÍTICO</span>
+            <span class="kpi-valor" th:text="${k.stockBajo + k.sinStock} + ' productos'"></span>
+            <span class="kpi-sub"><a class="enlace" th:href="@{/productos(inventario='CRITICO')}" th:text="${k.sinStock} + ' sin stock, ' + ${k.stockBajo} + ' stock bajo'"></a></span></div>
+        <div class="tarjeta kpi" th:classappend="${k.porVencer > 0} ? 'alerta'"><span class="kpi-titulo">LOTES POR VENCER</span>
+            <span class="kpi-valor" th:text="${k.porVencer}"></span>
+            <span class="kpi-sub"><a class="enlace" th:href="@{/inventario}">en los próximos 30 días</a></span></div>
+    </div>
+
+    <form class="tarjeta filtros" method="get" th:action="@{/dashboard}">
+        <label>Período
+            <select name="periodo" onchange="this.form.submit()">
+                <option value="hoy" th:selected="${periodo == 'hoy'}">Hoy</option>
+                <option value="7d" th:selected="${periodo == '7d'}">Últimos 7 días</option>
+                <option value="mes" th:selected="${periodo == 'mes'}">Este mes</option>
+                <option value="30d" th:selected="${periodo == '30d'}">Últimos 30 días</option>
+                <option value="90d" th:selected="${periodo == '90d'}">Últimos 90 días</option>
+            </select>
+        </label>
+        <label>Sede
+            <select name="sede" onchange="this.form.submit()">
+                <option value="">Todas</option>
+                <option th:each="sd : ${sedesActivas}" th:value="${sd.idSede}" th:text="${sd.nombre}" th:selected="${sd.idSede == sedeFiltro}"></option>
+            </select>
+        </label>
+    </form>
+
+    <div class="grilla-graficos">
+        <div class="tarjeta tarjeta-grafico ancho-2"><h3>Evolución de ventas (S/)</h3><div class="lienzo"><canvas id="g-evolucion"></canvas></div></div>
+        <div class="tarjeta tarjeta-grafico"><h3>Ventas por sede</h3><div class="lienzo"><canvas id="g-sedes"></canvas></div></div>
+        <div class="tarjeta tarjeta-grafico"><h3>Ventas por categoría</h3><div class="lienzo"><canvas id="g-categorias"></canvas></div></div>
+        <div class="tarjeta tarjeta-grafico"><h3>Top 5 productos (unidades)</h3><div class="lienzo"><canvas id="g-top"></canvas></div></div>
+        <div class="tarjeta tarjeta-grafico"><h3>Métodos de pago</h3><div class="lienzo"><canvas id="g-pagos"></canvas></div></div>
+        <div class="tarjeta tarjeta-grafico"><h3>Ventas por vendedor</h3><div class="lienzo"><canvas id="g-vendedores"></canvas></div></div>
+        <div class="tarjeta tarjeta-grafico"><h3>Estado del inventario</h3><div class="lienzo"><canvas id="g-inventario"></canvas></div></div>
+    </div>
+
+    <script th:src="@{/lib/chart.umd.js}"></script>
+    <script th:inline="javascript">
+        const datos = /*[[${graficos}]]*/ {};
+    </script>
+    <script th:src="@{/js/dashboard.js}"></script>
+</section>
+</body>
+</html>

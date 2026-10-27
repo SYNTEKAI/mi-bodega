@@ -1,0 +1,45 @@
+<html th:replace="~{fragments/layout :: pagina('Inventario', ~{::contenido})}" xmlns:th="http://www.thymeleaf.org">
+<body>
+<section th:fragment="contenido">
+    <div class="cabecera-vista"><h2>Inventario por lotes</h2></div>
+    <p class="subtitulo">Cada fila es un lote con stock. El sistema vende primero el lote que vence antes (FEFO). Los lotes por vencer (30 días o menos) se resaltan.</p>
+    <div class="tarjeta tabla-scroll">
+        <table>
+            <thead><tr><th>Lote</th><th>Producto</th><th>Presentación</th><th>Recepción</th><th>Ingresó</th><th>Queda</th><th>Costo unit.</th><th>Vencimiento</th><th>Días</th></tr></thead>
+            <tbody>
+            <tr th:each="l : ${lotes}"
+                th:classappend="${l.diasParaVencer != null and l.diasParaVencer < 0} ? 'fila-vencida' : (${l.diasParaVencer != null and l.diasParaVencer <= 30} ? 'fila-alerta')">
+                <td th:text="'L-' + ${l.idLote}"></td>
+                <td><strong th:text="${l.productoNombre}"></strong></td>
+                <td class="texto-suave" th:text="${l.presentacion} ?: ${l.unidad}"></td>
+                <td class="texto-suave" th:text="${l.recepcionNumero} ?: '-'"></td>
+                <td th:text="${l.cantidadIngresada}"></td>
+                <td><strong th:text="${l.cantidadActual}"></strong> <span th:text="${l.unidad}"></span></td>
+                <td class="sin-salto" th:text="${@fmt.soles(l.costoUnitario)}"></td>
+                <td th:text="${l.fechaVencimiento != null} ? ${@fmt.fecha(l.fechaVencimiento)} : 'No perecible'"></td>
+                <td>
+                    <span th:if="${l.diasParaVencer == null}">-</span>
+                    <span th:if="${l.diasParaVencer != null and l.diasParaVencer < 0}" class="badge roja">VENCIDO</span>
+                    <span th:if="${l.diasParaVencer != null and l.diasParaVencer >= 0 and l.diasParaVencer <= 30}" class="badge ambar" th:text="${l.diasParaVencer} + ' días'"></span>
+                    <span th:if="${l.diasParaVencer != null and l.diasParaVencer > 30}" th:text="${l.diasParaVencer} + ' días'"></span>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+        <p class="texto-suave centrado" th:if="${lotes.isEmpty()}">No hay lotes con stock en esta sede. Registra una Recepción.</p>
+    </div>
+    <div class="tarjeta" th:if="${sesion.puede('inventario','ajustar_stock') and !lotes.isEmpty()}">
+        <h3>Ajuste de stock (conteo físico)</h3>
+        <p class="subtitulo">Corrige la cantidad real de un lote tras un conteo. Genera un movimiento AJUSTE en el kardex y queda en la auditoría.</p>
+        <form class="fila-formulario" th:action="@{/inventario/ajuste}" method="post" data-confirmar="¿Aplicar el ajuste de stock?">
+            <select name="idLote">
+                <option th:each="l : ${lotes}" th:value="${l.idLote}" th:text="'L-' + ${l.idLote} + ' - ' + ${l.productoNombre} + ' (quedan ' + ${l.cantidadActual} + ')'"></option>
+            </select>
+            <input type="number" name="cantidad" min="0" placeholder="Cantidad real contada" required>
+            <input type="text" name="motivo" placeholder="Motivo (merma, rotura, conteo...)">
+            <button class="btn btn-primario" type="submit">Aplicar ajuste</button>
+        </form>
+    </div>
+</section>
+</body>
+</html>

@@ -1,0 +1,118 @@
+<html th:replace="~{fragments/layout :: pagina('Recepción', ~{::contenido})}" xmlns:th="http://www.thymeleaf.org">
+<body>
+<section th:fragment="contenido">
+    <div class="cabecera-vista">
+        <h2 th:text="${correccion} ? 'Corregir recepción ' + ${recepcion.numero} : (${recepcion.idRecepcion != null} ? 'Borrador ' + ${recepcion.numero} : 'Nueva recepción de mercadería')"></h2>
+        <a class="btn" th:href="@{/guias}">Guías recibidas</a>
+    </div>
+    <div class="aviso-correccion" th:if="${correccion}">
+        Estás corrigiendo una recepción <strong th:text="${recepcion.estado}"></strong>. Los cambios se aplican <strong>por diferencia</strong>
+        sobre el stock, el motivo es obligatorio y todo queda en la auditoría, el kardex y el historial. El número no cambia.
+    </div>
+
+    <form th:action="@{/recepcion/guardar}" method="post" id="form-recepcion">
+        <input type="hidden" name="idRecepcion" th:value="${recepcion.idRecepcion}">
+        <div class="tarjeta">
+            <h3>1. Datos de la recepción</h3>
+            <div class="grilla-form grilla-3">
+                <label>N° recepción interna <input type="text" th:value="${numero}" readonly></label>
+                <label>N° guía del proveedor * <input type="text" name="guiaProveedor" th:value="${recepcion.guiaProveedor}" placeholder="Ej: T001-45872" required></label>
+                <label>Proveedor *
+                    <span class="fila-select-boton">
+                        <select name="idProveedor" required>
+                            <option value="">Elegir...</option>
+                            <option th:each="p : ${proveedores}" th:value="${p.idProveedor}" th:text="${p.razonSocial} + ' (' + ${p.documento} + ')'"
+                                    th:selected="${p.idProveedor == recepcion.idProveedor}"></option>
+                        </select>
+                        <a class="btn btn-mini" th:if="${sesion.puede('proveedores','crear') and !correccion}" th:href="@{/proveedores/nuevo(volver='recepcion')}" title="Registrar proveedor">Nuevo</a>
+                    </span>
+                </label>
+                <label>Fecha de recepción <input type="text" th:value="${recepcion.fechaHora != null and correccion} ? ${@fmt.fechaHora(recepcion.fechaHora)} : 'La registra el sistema al confirmar'" readonly></label>
+                <label>Recibe <input type="text" th:value="${recepcion.usuarioNombre != null} ? ${recepcion.usuarioNombre} : ${sesion.nombre}" readonly></label>
+                <label>Estado <input type="text" th:value="${recepcion.estado}" readonly></label>
+            </div>
+        </div>
+
+        <div class="tarjeta">
+            <h3>2. Productos recibidos</h3>
+            <p class="texto-suave">Total en unidades = cantidad de empaques x unidades por empaque. El stock se guarda en unidades.</p>
+            <div class="tabla-scroll">
+                <table class="tabla-lineas">
+                    <thead><tr><th>Producto</th><th>Empaque</th><th>Unid./empaque</th><th>Cant. empaques</th><th>Costo por empaque (S/)</th><th>Vencimiento</th><th>Total unid.</th><th></th></tr></thead>
+                    <tbody id="lineas">
+                    <tr th:each="d : ${recepcion.detalles}" class="linea">
+                        <td>
+                            <input type="hidden" name="idLote" th:value="${correccion} ? ${d.idLote} : ''">
+                            <th:block th:if="${correccion}">
+                                <input type="hidden" name="productoId" th:value="${d.idProducto}">
+                                <strong th:text="${d.productoNombre}"></strong>
+                                <br><span class="texto-suave" th:if="${d.consumido > 0}" th:text="'ya salieron ' + ${d.consumido} + ' (mínimo permitido)'"></span>
+                            </th:block>
+                            <select th:unless="${correccion}" name="productoId" class="sel-producto">
+                                <option th:each="p : ${productos}" th:value="${p.idProducto}" th:text="${p.nombre}" th:selected="${p.idProducto == d.idProducto}"
+                                        th:attr="data-empaque=${p.empaque},data-contenido=${p.unidadesPorEmpaque},data-costo=${p.precioCompra}"></option>
+                            </select>
+                        </td>
+                        <td><select name="empaque" class="sel-empaque"><option th:each="e : ${empaques}" th:value="${e}" th:text="${e}" th:selected="${e == d.empaque}"></option></select></td>
+                        <td><input type="number" name="contenido" class="contenido" min="1" th:value="${d.contenido}"></td>
+                        <td><input type="number" name="cantidadEmpaques" class="cantidad" min="1" th:value="${d.cantidadEmpaques}" required></td>
+                        <td><input type="number" name="costoEmpaque" step="0.01" min="0" th:value="${d.costoEmpaque}"></td>
+                        <td><input type="date" name="vencimiento" th:value="${d.fechaVencimiento}"></td>
+                        <td><strong class="total-linea"></strong></td>
+                        <td><button type="button" class="btn btn-mini btn-peligro-suave quitar" th:disabled="${d.consumido > 0}">Quitar</button></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+            <p><button type="button" class="btn" id="agregar">Agregar producto</button>
+               <span class="texto-suave" style="margin-left:10px">Total: <strong id="total-unidades">0</strong> unidades</span></p>
+        </div>
+
+        <div class="tarjeta">
+            <h3>3. Observaciones</h3>
+            <textarea name="observaciones" rows="2" placeholder="Faltantes, productos dañados, diferencias con la guía..." th:text="${recepcion.observaciones}"></textarea>
+
+            <div th:if="${correccion}" style="margin-top:12px">
+                <h3>Motivo de la corrección *</h3>
+                <div class="lista-motivos">
+                    <label class="check-linea" th:each="m : ${motivos}"><input type="radio" name="motivo" th:value="${m}" required> <span th:text="${m}"></span></label>
+                </div>
+                <label>Si elegiste "Otro", explica el motivo <input type="text" name="motivoOtro"></label>
+                <label>Detalle adicional (opcional) <input type="text" name="motivoDetalle" placeholder="Ej: la caja estaba en otra zona del almacén"></label>
+            </div>
+
+            <div class="acciones-modal">
+                <a class="btn" th:href="@{/guias}">Cancelar</a>
+                <th:block th:if="${correccion}">
+                    <button class="btn btn-primario" type="submit" name="accion" value="corregir">Guardar corrección</button>
+                </th:block>
+                <th:block th:unless="${correccion}">
+                    <button class="btn" type="submit" name="accion" value="borrador" formnovalidate>Guardar borrador</button>
+                    <button class="btn btn-primario" type="submit" name="accion" value="confirmar"
+                            onclick="return confirm('Al confirmar se crean los lotes y la mercadería ingresa al stock. ¿Continuar?')">Confirmar recepción</button>
+                </th:block>
+            </div>
+        </div>
+    </form>
+
+    <!-- Fila modelo para agregar productos -->
+    <template id="fila-modelo">
+        <tr class="linea">
+            <td><input type="hidden" name="idLote" value="">
+                <select name="productoId" class="sel-producto">
+                    <option th:each="p : ${productos}" th:value="${p.idProducto}" th:text="${p.nombre}"
+                            th:attr="data-empaque=${p.empaque},data-contenido=${p.unidadesPorEmpaque},data-costo=${p.precioCompra}"></option>
+                </select></td>
+            <td><select name="empaque" class="sel-empaque"><option th:each="e : ${empaques}" th:value="${e}" th:text="${e}"></option></select></td>
+            <td><input type="number" name="contenido" class="contenido" min="1" value="1"></td>
+            <td><input type="number" name="cantidadEmpaques" class="cantidad" min="1" required></td>
+            <td><input type="number" name="costoEmpaque" step="0.01" min="0"></td>
+            <td><input type="date" name="vencimiento"></td>
+            <td><strong class="total-linea"></strong></td>
+            <td><button type="button" class="btn btn-mini btn-peligro-suave quitar">Quitar</button></td>
+        </tr>
+    </template>
+    <script th:src="@{/js/recepcion.js}"></script>
+</section>
+</body>
+</html>

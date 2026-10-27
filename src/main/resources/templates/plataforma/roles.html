@@ -1,0 +1,33 @@
+<html th:replace="~{fragments/layout :: pagina('Roles internos', ~{::contenido})}" xmlns:th="http://www.thymeleaf.org">
+<body>
+<section th:fragment="contenido">
+    <div class="cabecera-vista">
+        <h2>Roles internos de la plataforma</h2>
+        <a class="btn btn-primario" th:if="${sesion.rolPrincipal}" th:href="@{/plataforma/roles/nuevo}">Nuevo rol</a>
+    </div>
+    <div class="grilla-tarjetas">
+        <div class="tarjeta tarjeta-rol" th:each="r : ${roles}">
+            <div class="fila-espaciada">
+                <h3><span th:text="${r.nombre}"></span> <span class="badge ambar" th:if="${r.principal}">PRINCIPAL</span></h3>
+                <span class="badge" th:classappend="${r.activo} ? 'verde' : 'roja'" th:text="${r.activo} ? 'ACTIVO' : 'INACTIVO'"></span>
+            </div>
+            <p class="texto-suave" th:text="${r.usuarios} + ' usuario(s)'"></p>
+            <ul style="margin:6px 0 0 18px">
+                <th:block th:each="m : ${modulos}">
+                    <th:block th:each="p : ${m.value}">
+                        <li th:if="${r.principal or #sets.contains(permisosRol.get(r.idRolInterno), p.clave)}" th:text="${p.descripcion}"></li>
+                    </th:block>
+                </th:block>
+            </ul>
+            <div class="acciones-tarjeta" th:if="${sesion.rolPrincipal and !r.principal}" style="margin-top:10px">
+                <a class="btn btn-mini" th:href="@{/plataforma/roles/{id}/editar(id=${r.idRolInterno})}">Editar</a>
+                <form th:action="@{/plataforma/roles/{id}/eliminar(id=${r.idRolInterno})}" method="post"
+                      th:attr="data-confirmar='¿Eliminar el rol ' + ${r.nombre} + '?'">
+                    <button class="btn btn-mini btn-peligro-suave" type="submit">Eliminar</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+</body>
+</html>

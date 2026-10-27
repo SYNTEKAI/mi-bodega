@@ -1,0 +1,36 @@
+<html th:replace="~{fragments/layout :: pagina('Usuario', ~{::contenido})}" xmlns:th="http://www.thymeleaf.org">
+<body>
+<section th:fragment="contenido">
+    <div class="cabecera-vista"><h2 th:text="${usuario.idUsuario == null} ? 'Nuevo usuario' : 'Editar usuario'"></h2></div>
+    <form class="tarjeta" style="max-width:640px" th:action="@{/usuarios/guardar}" method="post" th:object="${usuario}">
+        <input type="hidden" th:field="*{idUsuario}">
+        <div class="grilla-form">
+            <label class="col-2">Nombre completo <input type="text" th:field="*{nombre}" required></label>
+            <label>Usuario (login) <input type="text" th:field="*{usuario}" th:readonly="${usuario.idUsuario != null}" required></label>
+            <label th:if="${usuario.idUsuario == null}">Contraseña inicial <input type="password" name="clave" placeholder="Mín. 8, letras y números" required></label>
+            <label th:if="${usuario.idUsuario != null}">Contraseña <input type="text" value="Usa 'Restablecer clave' en la lista" disabled></label>
+            <label class="col-2">Sede
+                <select th:field="*{idSede}" required>
+                    <option th:each="sd : ${sedesActivas}" th:value="${sd.idSede}" th:text="${sd.nombre}"></option>
+                </select>
+            </label>
+        </div>
+        <p class="subtitulo-modal">Roles asignados <span class="texto-suave">(el usuario puede cambiar entre ellos desde su perfil)</span></p>
+        <div class="lista-acciones">
+            <label class="check-linea" th:each="r : ${roles}">
+                <input type="checkbox" name="roles" th:value="${r.idRol}" th:checked="${asignados.contains(r.idRol)}"> <span th:text="${r.nombre}"></span></label>
+        </div>
+        <label>Rol activo al ingresar
+            <select th:field="*{idRolActivo}" required>
+                <option th:each="r : ${roles}" th:value="${r.idRol}" th:text="${r.nombre}"></option>
+            </select>
+        </label>
+        <label class="check-linea" th:if="${usuario.idUsuario == null}"><input type="checkbox" name="forzarCambio" value="true" checked> Pedir cambio de contraseña en el primer ingreso</label>
+        <div class="acciones-modal">
+            <a class="btn" th:href="@{/usuarios}">Cancelar</a>
+            <button class="btn btn-primario" type="submit">Guardar</button>
+        </div>
+    </form>
+</section>
+</body>
+</html>
